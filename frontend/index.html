@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Phishing & URL Analyzer | Cybersecurity Intelligence</title>
+  <meta name="description" content="AI-assisted real-time phishing URL detection and dual-layered cybersecurity analysis dashboard.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="cyber-bg-overlay"></div>
+  <div class="grid-pattern"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="shield-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M12 8v4"></path>
+            <path d="M12 16h.01"></path>
+          </svg>
+        </div>
+        <div>
+          <h1>Smart Phishing &amp; URL Analyzer</h1>
+          <p class="subtitle">Multi-Agent Security Engine &amp; Threat Telemetry</p>
+        </div>
+      </div>
+      <div class="backend-status" id="backendStatus">
+        <span class="status-dot"></span>
+        <span class="status-text">Backend: Connecting...</span>
+      </div>
+    </header>
+
+    <!-- Main URL Input Section -->
+    <section class="search-section glass-card">
+      <form id="urlForm" class="search-form">
+        <div class="input-wrapper">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+          </div>
+          <input type="url" id="urlInput" placeholder="Paste suspect URL here (e.g. http://login.paypal.verify-account.info/auth)..." required autocomplete="off">
+          <button type="button" class="clear-btn" id="clearBtn" title="Clear input">&times;</button>
+        </div>
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span class="btn-text">Analyze URL</span>
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </form>
+
+      <!-- Quick Test Presets -->
+      <div class="presets-container">
+        <span class="presets-label">Quick Test Scenarios:</span>
+        <div class="preset-buttons">
+          <button class="preset-btn safe-preset" data-url="https://www.google.com">
+            <span class="dot"></span> Google (Safe)
+          </button>
+          <button class="preset-btn caution-preset" data-url="http://mybank-security-update.com/login?session=8932">
+            <span class="dot"></span> Banking Update (Caution)
+          </button>
+          <button class="preset-btn danger-preset" data-url="http://login.paypal.verify-account.info/auth/signin?token=123456789">
+            <span class="dot"></span> Phishing Impersonation (High Risk)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Radar Scanning Loader -->
+    <div class="scanner-loader hidden" id="scannerLoader">
+      <div class="radar-circle">
+        <div class="radar-sweep"></div>
+      </div>
+      <p class="loader-text">Analyzing URL structure, SSL integrity &amp; threat telemetry...</p>
+    </div>
+
+    <!-- Results Display Container -->
+    <div id="resultsContainer" class="results-container hidden">
+      
+      <!-- Persona View Switcher Header -->
+      <div class="persona-bar glass-card">
+        <div class="persona-title">
+          <span class="persona-badge" id="activePersonaBadge">User Mode</span>
+          <h2>Threat Evaluation Dashboard</h2>
+        </div>
+        
+        <!-- Toggle Switch for Expert Mode -->
+        <label class="toggle-container">
+          <span class="toggle-label">Technical Deep-Dive (Analyst Mode)</span>
+          <div class="toggle-switch">
+            <input type="checkbox" id="expertToggle">
+            <span class="slider"></span>
+          </div>
+        </label>
+      </div>
+
+      <!-- LAYER 1: USER VIEW (DEFAULT) -->
+      <section class="user-layer-view" id="userLayerView">
+        <div class="dashboard-grid">
+          
+          <!-- Risk Score Meter Card -->
+          <div class="glass-card score-card">
+            <div class="card-header">
+              <h3>Risk Index</h3>
+              <span class="risk-badge" id="userRiskBadge">SAFE</span>
+            </div>
+            
+            <div class="gauge-wrapper">
+              <svg class="gauge-svg" viewBox="0 0 160 160">
+                <circle class="gauge-bg" cx="80" cy="80" r="65"></circle>
+                <circle class="gauge-fill" id="gaugeFill" cx="80" cy="80" r="65" stroke-dasharray="408" stroke-dashoffset="408"></circle>
+              </svg>
+              <div class="gauge-center">
+                <span class="score-number" id="userRiskScore">0</span>
+                <span class="score-max">/ 100</span>
+              </div>
+            </div>
+
+            <p class="score-subtext" id="scoreSubtext">Evaluated based on Level 1 Threat Analysis</p>
+          </div>
+
+          <!-- Plain-English Summary & Action Card -->
+          <div class="glass-card summary-card">
+            <div class="card-header">
+              <h3>Security Summary</h3>
+              <span class="shield-indicator" id="shieldIndicator">🛡️</span>
+            </div>
+
+            <div class="summary-body">
+              <p class="summary-text" id="userSummary">Enter a URL above to analyze its security level.</p>
+              
+              <div class="recommendation-box" id="recommendationBox">
+                <div class="rec-icon" id="recIcon">ℹ️</div>
+                <div class="rec-content">
+                  <h4 id="recTitle">Recommendation</h4>
+                  <p id="recDesc">Always double-check link destinations before entering credentials.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- LAYER 2: EXPERT VIEW (TECHNICAL DEEP-DIVE) -->
+      <section class="expert-layer-view hidden" id="expertLayerView">
+        <div class="expert-grid">
+          
+          <!-- Domain Breakdown Card -->
+          <div class="glass-card expert-card">
+            <div class="card-header">
+              <h3><span class="code-icon">&lt;/&gt;</span> Domain Structure Breakdown</h3>
+              <span class="tech-tag">URL Parser</span>
+            </div>
+            <div class="breakdown-grid" id="domainBreakdownGrid">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+
+          <!-- Network & Security Telemetry Card -->
+          <div class="glass-card expert-card">
+            <div class="card-header">
+              <h3><span class="code-icon">⚡</span> Security Flags &amp; Telemetry</h3>
+              <span class="tech-tag">Heuristics</span>
+            </div>
+            <div class="telemetry-list" id="telemetryList">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+
+          <!-- Simulated HTTP Headers Grid -->
+          <div class="glass-card expert-card full-width">
+            <div class="card-header">
+              <h3><span class="code-icon">🔒</span> Simulated Security Headers</h3>
+              <span class="tech-tag">HTTP Response</span>
+            </div>
+            <div class="headers-grid" id="headersGrid">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+
+          <!-- Raw JSON Inspector -->
+          <div class="glass-card expert-card full-width">
+            <div class="card-header">
+              <h3><span class="code-icon">{ }</span> Raw Dual-Layered JSON Output</h3>
+              <button class="copy-json-btn" id="copyJsonBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy JSON
+              </button>
+            </div>
+            <pre class="json-code-block"><code id="rawJsonCode">// JSON output will appear here</code></pre>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p>Smart Phishing &amp; URL Analyzer &bull; Built with Multi-Agent Orchestration &bull; Cybersecurity Intelligence Platform</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
