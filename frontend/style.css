@@ -145,10 +145,10 @@ body {
   gap: 10px;
 }
 
-.v2-badge {
+.v5-badge {
   font-size: 0.72rem;
   font-family: var(--font-code);
-  background: linear-gradient(135deg, #ff9900, #ff5500);
+  background: linear-gradient(135deg, #00f2fe, #8b5cf6);
   color: #04060d;
   -webkit-text-fill-color: #04060d;
   padding: 3px 10px;
@@ -156,7 +156,212 @@ body {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  box-shadow: 0 0 14px rgba(255, 153, 0, 0.6);
+  box-shadow: 0 0 14px rgba(0, 242, 254, 0.6);
+}
+
+/* Level 5 Threat Intel Badges */
+.threat-intel-badges-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .threat-intel-badges-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.intel-badge-card {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.intel-badge-provider {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.intel-badge-status {
+  font-family: var(--font-code);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.intel-badge-status.malicious { color: var(--color-danger); }
+.intel-badge-status.suspicious { color: var(--color-caution); }
+.intel-badge-status.clean { color: var(--color-safe); }
+
+/* Level 3 Redirect Node Map */
+.redirect-node-map {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+
+.redirect-node-card {
+  background: rgba(7, 10, 18, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.2rem;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.redirect-node-hop {
+  font-size: 0.72rem;
+  font-family: var(--font-code);
+  color: var(--accent-cyan);
+}
+
+.redirect-node-url {
+  font-family: var(--font-code);
+  font-size: 0.83rem;
+  color: var(--text-main);
+  word-break: break-all;
+}
+
+.redirect-node-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.redirect-arrow {
+  color: var(--accent-cyan);
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+/* Level 4 Mitigation Payloads */
+.mitigation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.mitigation-box {
+  background: rgba(7, 10, 18, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+
+.mitigation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.mitigation-header h4 {
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.dl-btn {
+  background: rgba(0, 242, 254, 0.1);
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.payload-code {
+  background: #04060d;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.8rem;
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  color: #a7f3d0;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+/* Level 5 Red/Blue Benchmark */
+.benchmark-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.bench-stat-card {
+  background: rgba(7, 10, 18, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bench-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.bench-value {
+  font-family: var(--font-code);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+}
+
+.bench-value.safe { color: var(--color-safe); }
+
+.run-benchmark-btn {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  border: none;
+  border-radius: 8px;
+  color: #0b0f19;
+  font-weight: 700;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.benchmark-table-wrapper {
+  overflow-x: auto;
+}
+
+.benchmark-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-code);
+  font-size: 0.83rem;
+}
+
+.benchmark-table th, .benchmark-table td {
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.benchmark-table th {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+}
+
+.margin-top-lg {
+  margin-top: 1.5rem;
 }
 
 .subtitle {
@@ -995,3 +1200,161 @@ body {
   margin-top: 3rem;
   z-index: 1;
 }
+
+/* LEVEL 5 SPECIFIC CSS */
+
+/* Threat Intel Badges */
+.intel-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.intel-badge {
+  background: rgba(7, 10, 18, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.intel-badge:hover {
+  border-color: var(--accent-cyan);
+}
+
+.intel-badge-header {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.intel-badge-value {
+  font-family: var(--font-code);
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.intel-badge-value.warning { color: var(--color-caution); }
+.intel-badge-value.danger { color: var(--color-danger); }
+.intel-badge-value.safe { color: var(--color-safe); }
+
+/* Node Map Container */
+.node-map-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+
+.node-hop {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.node-hop .hop-url {
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  color: var(--accent-cyan);
+  word-break: break-all;
+}
+
+.node-hop .hop-status {
+  font-size: 0.75rem;
+  background: rgba(255,255,255,0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  align-self: flex-start;
+  color: #fff;
+}
+
+.node-hop .hop-status.status-200 { background: var(--color-safe); color: #000; }
+.node-hop .hop-status.status-301, .node-hop .hop-status.status-302 { background: var(--color-caution); color: #000; }
+
+.node-arrow {
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Mitigation Panel */
+.mitigation-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.8rem 1.2rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.mitigation-btn:hover {
+  background: rgba(0, 242, 254, 0.1);
+  border-color: var(--accent-cyan);
+  transform: translateY(-2px);
+}
+
+/* Benchmark Table */
+.benchmark-table-container {
+  margin-top: 1.5rem;
+  overflow-x: auto;
+}
+
+.benchmark-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.benchmark-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.benchmark-table td {
+  padding: 1rem;
+  font-size: 0.85rem;
+}
+
+.benchmark-table td.payload-type {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.benchmark-table td.payload-example {
+  font-family: var(--font-code);
+  color: var(--text-muted);
+}
+
+.benchmark-result-pill {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+.benchmark-result-pill.detected {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-safe);
+  border: 1px solid var(--color-safe);
+}
+.benchmark-result-pill.missed {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
+
