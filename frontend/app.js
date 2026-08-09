@@ -320,16 +320,21 @@ function renderExpertLayer(expertLayer, fullData) {
   const { domain_breakdown, telemetry } = expertLayer;
 
   domainBreakdownGrid.innerHTML = `
-    <div class="breakdown-item"><div class="breakdown-label">Protocol</div><div class="breakdown-value">${escapeHtml(domain_breakdown.protocol)}</div></div>
-    <div class="breakdown-item"><div class="breakdown-label">Hostname</div><div class="breakdown-value">${escapeHtml(domain_breakdown.hostname)}</div></div>
+    <div class="breakdown-item"><div class="breakdown-label">Normalized URL</div><div class="breakdown-value">${escapeHtml(telemetry.normalized_url || domain_breakdown.hostname)}</div></div>
+    <div class="breakdown-item"><div class="breakdown-label">Apex Domain</div><div class="breakdown-value">${escapeHtml(domain_breakdown.apex_domain || domain_breakdown.domain)}</div></div>
     <div class="breakdown-item"><div class="breakdown-label">Subdomains</div><div class="breakdown-value">${escapeHtml(domain_breakdown.subdomain)}</div></div>
-    <div class="breakdown-item"><div class="breakdown-label">Domain & TLD</div><div class="breakdown-value">${escapeHtml(domain_breakdown.domain)}.${escapeHtml(domain_breakdown.tld)}</div></div>
+    <div class="breakdown-item"><div class="breakdown-label">Protocol & TLD</div><div class="breakdown-value">${escapeHtml(domain_breakdown.protocol)} / .${escapeHtml(domain_breakdown.tld)}</div></div>
   `;
 
+  const allowlistStatus = telemetry.allowlist_matched ? `MATCHED (${domain_breakdown.apex_domain})` : 'NONE';
+  const typoStatus = telemetry.typosquatting_detected ? `LOOKALIKE DIST: ${telemetry.levenshtein_distance} (Target: ${telemetry.typosquatting_target})` : 'CLEAN';
+
   telemetryList.innerHTML = `
-    <div class="telemetry-row"><span class="telemetry-key">URL Length</span><span class="telemetry-val">${telemetry.url_length} chars</span></div>
-    <div class="telemetry-row"><span class="telemetry-key">Domain Entropy</span><span class="telemetry-val">${telemetry.domain_entropy}</span></div>
-    <div class="telemetry-row"><span class="telemetry-key">IP Host</span><span class="telemetry-val ${!telemetry.is_ip_host}">${telemetry.is_ip_host ? 'YES' : 'NO'}</span></div>
+    <div class="telemetry-row"><span class="telemetry-key">Allowlist Match Status</span><span class="telemetry-val ${telemetry.allowlist_matched}">${allowlistStatus}</span></div>
+    <div class="telemetry-row"><span class="telemetry-key">Typosquatting Distance</span><span class="telemetry-val ${!telemetry.typosquatting_detected}">${typoStatus}</span></div>
+    <div class="telemetry-row"><span class="telemetry-key">Shannon Entropy Score</span><span class="telemetry-val">${telemetry.domain_entropy || 0.0}</span></div>
+    <div class="telemetry-row"><span class="telemetry-key">URL Character Length</span><span class="telemetry-val">${telemetry.url_length} chars</span></div>
+    <div class="telemetry-row"><span class="telemetry-key">IP Address Host</span><span class="telemetry-val ${!telemetry.is_ip_host}">${telemetry.is_ip_host ? 'YES' : 'NO'}</span></div>
   `;
 
   headersGrid.innerHTML = '';

@@ -12,8 +12,8 @@ const HIGH_RISK_TLDS = [
   'cf', 'gq', 'club', 'work', 'vip', 'cam', 'icu', 'rest', 'fit'
 ];
 
-// Whitelist of major authentic root domains to eliminate false positives
-const MAJOR_ROOT_DOMAINS = new Set([
+// Top Authentic Apex Domains Allowlist
+const TOP_DOMAIN_ALLOWLIST = new Set([
   'google.com', 'google.co.in', 'google.co.uk',
   'microsoft.com', 'microsoftonline.com', 'live.com', 'office.com',
   'apple.com', 'icloud.com',
@@ -38,6 +38,38 @@ const MAJOR_ROOT_DOMAINS = new Set([
   'cloudflare.com',
   'reddit.com'
 ]);
+
+// Top Brand Benchmarks for Levenshtein Typosquatting Detection
+const BRAND_BENCHMARKS = [
+  'google', 'microsoft', 'paypal', 'apple', 'github', 
+  'amazon', 'facebook', 'twitter', 'linkedin', 'netflix',
+  'instagram', 'metamask', 'binance', 'coinbase', 'adobe'
+];
+
+// Levenshtein Distance Algorithm for Fuzzy String Matching
+function levenshteinDistance(a, b) {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          matrix[i][j - 1] + 1,     // insertion
+          matrix[i - 1][j] + 1      // deletion
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
 
 // Calculate Shannon Entropy for DGA (Domain Generation Algorithm) detection
 function calculateEntropy(str) {
@@ -68,14 +100,17 @@ function analyzeUrl(urlString) {
   let summaryReasons = [];
   const threatCategories = new Set();
 
-  let trimmedUrl = urlString.trim();
-  
-  // 1. Automatic Protocol Prepending: Default to https:// if missing
+  let trimmedUrl = (urlString || '').trim();
+  if (!trimmedUrl) {
+    return { error: 'Please enter a URL to analyze.' };
+  }
+
+  // 1. URL Normalization & Scheme Sanitization
   let formattedUrl = trimmedUrl;
   if (!/^https?:\/\//i.test(formattedUrl)) {
     formattedUrl = 'https://' + formattedUrl;
   }
-  
+
   let parsedUrl;
   try {
     parsedUrl = new URL(formattedUrl);
@@ -83,20 +118,96 @@ function analyzeUrl(urlString) {
     return { error: 'Invalid URL format provided.' };
   }
 
-  const { protocol, hostname, port, pathname, search, searchParams } = parsedUrl;
-  
+  const protocol = parsedUrl.protocol.toLowerCase();
+  const hostname = parsedUrl.hostname.toLowerCase();
+  const pathname = parsedUrl.pathname;
+  const search = parsedUrl.search;
+  const searchParams = parsedUrl.searchParams;
+  const port = parsedUrl.port;
+  const normalizedUrl = parsedUrl.href;
+
+  // 2. Strict TLD & Apex Domain Extraction
+  const isIp = isIPAddress(hostname);
+  const hostParts = hostname.split('.');
+  let subdomain = '(None)';
+  let domain = hostname;
+  let tld = '(None)';
+  let apexDomain = hostname;
+
+  if (!isIp) {
+    if (hostParts.length > 2) {
+      subdomain = hostParts.slice(0, hostParts.length - 2).join('.');
+      domain = hostParts[hostParts.length - 2];
+      tld = hostParts[hostParts.length - 1];
+      apexDomain = `${domain}.${tld}`;
+    } else if (hostParts.length === 2) {
+      subdomain = '(None)';
+      domain = hostParts[0];
+      tld = hostParts[1];
+      apexDomain = `${domain}.${tld}`;
+    }
+  }
+
+  const isAllowlistedApex = TOP_DOMAIN_ALLOWLIST.has(apexDomain) || TOP_DOMAIN_ALLOWLIST.has(hostname);
+  const isStandardSubdomain = subdomain === '(None)' || subdomain === 'www';
+
+  // 3. Brand Homoglyph / Typosquatting Detector (Levenshtein Distance)
+  let typosquattingDetected = false;
+  let typosquattingTarget = null;
+  let typosquattingDistance = null;
+
+  if (!isIp && !isAllowlistedApex) {
+    // Tokenize domain parts (e.g., g00gle-login-verify -> ['g00gle', 'login', 'verify'])
+    const domainTokens = domain.split(/[-_.]+/);
+    const normalizedDomainName = domain.replace(/[-_]/g, '');
+
+    for (const brand of BRAND_BENCHMARKS) {
+      if (domain === brand) continue;
+
+      // 1. Check full domain name distance
+      let dist = levenshteinDistance(normalizedDomainName, brand);
+
+      // 2. Check individual token distance (e.g. g00gle in g00gle-login-verify)
+      if (dist > 2) {
+        for (const token of domainTokens) {
+          if (token === brand) continue;
+          const tokenDist = levenshteinDistance(token, brand);
+          if (tokenDist <= 2 && token.length >= (brand.length - 2)) {
+            dist = tokenDist;
+            break;
+          }
+        }
+      }
+      
+      // If Levenshtein distance <= 2 OR domain contains brand lookalike string
+      if (dist <= 2) {
+        typosquattingDetected = true;
+        typosquattingTarget = brand;
+        typosquattingDistance = dist;
+        break;
+      }
+    }
+  }
+
   const telemetry = {
-    url_length: formattedUrl.length,
+    normalized_url: normalizedUrl,
+    apex_domain: apexDomain,
+    subdomain: subdomain,
+    tld: tld,
+    url_length: normalizedUrl.length,
     url_length_flag: 'Safe',
     https_valid: protocol === 'https:',
     ssl_simulated_status: protocol === 'https:' ? 'Simulated Valid' : 'Insecure / Missing SSL',
-    is_ip_host: isIPAddress(hostname),
+    is_ip_host: isIp,
     is_punycode: hostname.includes('xn--'),
     non_standard_port: Boolean(port && port !== '80' && port !== '443'),
-    domain_entropy: calculateEntropy(hostname.split('.')[0] || hostname),
+    domain_entropy: calculateEntropy(domain),
     high_risk_tld_detected: false,
     suspicious_subdomains_detected: false,
-    is_whitelisted_domain: false,
+    allowlist_matched: isAllowlistedApex && isStandardSubdomain,
+    typosquatting_detected: typosquattingDetected,
+    typosquatting_target: typosquattingTarget,
+    levenshtein_distance: typosquattingDistance,
     phishing_keywords_found: [],
     decoded_query_payloads: [],
     regex_matches: [],
@@ -109,172 +220,104 @@ function analyzeUrl(urlString) {
     }
   };
 
-  // Protocol & SSL Check
-  if (protocol !== 'https:') {
-    riskScore += 25;
-    threatCategories.add('Unencrypted Connection');
-    summaryReasons.push('The URL uses an unencrypted HTTP protocol, leaving transmissions vulnerable to interception.');
-  }
-
-  // Direct IP Address Hostname Check
-  if (telemetry.is_ip_host) {
-    riskScore += 35;
-    threatCategories.add('IP Host Bypassing DNS');
-    summaryReasons.push('Uses a raw IP address instead of a domain name, commonly used to bypass domain blacklists.');
-    telemetry.regex_matches.push({ rule: 'Direct IP Hostname', pattern: '^(\\d{1,3}\\.){3}\\d{1,3}$', matched: hostname });
-  }
-
-  // Non-Standard Port Check
-  if (telemetry.non_standard_port) {
-    riskScore += 15;
-    threatCategories.add('Non-Standard Web Port');
-    summaryReasons.push(`Connects via non-standard web port :${port}.`);
-  }
-
-  // Subdomain & TLD Analysis
-  const hostParts = hostname.split('.');
-  const domainPartsCount = hostParts.length;
-  let subdomainCount = 0;
-  let subdomains = [];
-  let domain = '';
-  let tld = '';
-
-  if (!telemetry.is_ip_host) {
-    if (domainPartsCount > 2) {
-      subdomainCount = domainPartsCount - 2;
-      subdomains = hostParts.slice(0, domainPartsCount - 2);
-      domain = hostParts[domainPartsCount - 2];
-      tld = hostParts[domainPartsCount - 1].toLowerCase();
-    } else if (domainPartsCount === 2) {
-      domain = hostParts[0];
-      tld = hostParts[1].toLowerCase();
-    } else {
-      domain = hostname;
+  // 4. Weighted Threat Vector Scoring Logic
+  if (telemetry.allowlist_matched) {
+    // Top-Domain Allowlist Guard: Cap Risk Score at 0 for legitimate root domains
+    riskScore = 0;
+    summaryReasons.push(`Verified authentic apex domain (${apexDomain}). Risk score capped at 0 (Safe).`);
+  } else {
+    // Typosquatting / Brand Lookalike Penalty (+80 pts)
+    if (typosquattingDetected) {
+      riskScore += 80;
+      threatCategories.add('Typosquatting Lookalike');
+      summaryReasons.push(`Brand typosquatting detected! Hostname '${domain}' is a lookalike of authentic brand '${typosquattingTarget}' (Levenshtein distance: ${typosquattingDistance}).`);
+      telemetry.regex_matches.push({ rule: 'Brand Typosquatting Lookalike', pattern: typosquattingTarget, matched: domain });
     }
 
-    const rootDomain = (domain && tld) ? `${domain}.${tld}`.toLowerCase() : hostname.toLowerCase();
-
-    // 2. Whitelist Check for Major Root Domains
-    const isWhitelistedRoot = MAJOR_ROOT_DOMAINS.has(rootDomain) || MAJOR_ROOT_DOMAINS.has(hostname.toLowerCase());
-    const isStandardSubdomain = subdomains.length === 0 || (subdomains.length === 1 && subdomains[0].toLowerCase() === 'www');
-
-    if (isWhitelistedRoot && isStandardSubdomain) {
-      telemetry.is_whitelisted_domain = true;
+    // Protocol Check (+25 pts)
+    if (protocol !== 'https:') {
+      riskScore += 25;
+      threatCategories.add('Unencrypted Connection');
+      summaryReasons.push('Uses an unencrypted HTTP connection.');
     }
 
-    // Subdomain Obfuscation (only for non-standard subdomains)
-    if (subdomainCount >= 2 && !telemetry.is_whitelisted_domain) {
+    // Direct IP Host Check (+35 pts)
+    if (telemetry.is_ip_host) {
+      riskScore += 35;
+      threatCategories.add('IP Host Bypassing DNS');
+      summaryReasons.push('Uses a raw IP address instead of a domain name.');
+    }
+
+    // Non-Standard Port (+15 pts)
+    if (telemetry.non_standard_port) {
+      riskScore += 15;
+      threatCategories.add('Non-Standard Web Port');
+      summaryReasons.push(`Connects via non-standard port :${port}.`);
+    }
+
+    // Subdomain Obfuscation (+20 pts)
+    if (subdomain !== '(None)' && subdomain.split('.').length >= 2) {
       riskScore += 20;
       threatCategories.add('Subdomain Obfuscation');
-      summaryReasons.push(`Excessive subdomains detected (${subdomainCount}), a frequent tactic to mimic legitimate brands.`);
+      summaryReasons.push(`Excessive subdomains detected (${subdomain}).`);
       telemetry.suspicious_subdomains_detected = true;
     }
 
-    // High Risk TLD Check
+    // High Risk TLD (+15 pts)
     if (HIGH_RISK_TLDS.includes(tld)) {
       riskScore += 15;
       telemetry.high_risk_tld_detected = true;
       threatCategories.add('High-Risk Top-Level Domain');
-      summaryReasons.push(`Uses top-level domain .${tld}, statistically associated with spam and phishing campaigns.`);
+      summaryReasons.push(`Uses high-risk top-level domain .${tld}.`);
     }
 
-    // Punycode / Homograph Attack Detection
+    // Punycode Homograph (+30 pts)
     if (telemetry.is_punycode) {
       riskScore += 30;
       threatCategories.add('IDN Homograph Spoofing');
-      summaryReasons.push('Punycode detected (xn-- prefix), indicating a potential Internationalized Domain Name (IDN) homograph attack.');
-      telemetry.regex_matches.push({ rule: 'Punycode Homograph', pattern: 'xn--', matched: hostname });
+      summaryReasons.push('Punycode homograph spoofing detected.');
     }
 
-    // DGA / Domain Entropy Analysis
-    if (telemetry.domain_entropy > 3.75 && domain.length > 7 && !telemetry.is_whitelisted_domain) {
+    // Shannon Entropy (+20 pts)
+    if (telemetry.domain_entropy > 3.75 && domain.length > 7) {
       riskScore += 20;
       threatCategories.add('High Domain Entropy (DGA)');
-      summaryReasons.push(`High domain randomness score (${telemetry.domain_entropy}), suggesting algorithmic domain generation (DGA).`);
+      summaryReasons.push(`High domain randomness score (${telemetry.domain_entropy}).`);
     }
 
-    // Brand Spoofing in Subdomains
-    const allSubdomainText = subdomains.join('.').toLowerCase();
-    PHISHING_KEYWORDS.forEach(keyword => {
-      // Exclude keyword matching if it matches the legitimate root domain itself
-      if (allSubdomainText.includes(keyword) && keyword !== domain.toLowerCase()) {
-        telemetry.phishing_keywords_found.push(`subdomain:${keyword}`);
-      }
-    });
-
-    if (telemetry.phishing_keywords_found.length > 0 && !telemetry.is_ip_host) {
-      riskScore += 25;
-      threatCategories.add('Brand Impersonation');
-      summaryReasons.push('Target credential-harvesting keywords found in subdomain strings.');
-      telemetry.suspicious_subdomains_detected = true;
-    }
-
-    // Phishing Keyword Scanning (domain & path)
+    // Phishing Keywords in Path or Query (+15 pts)
     const domainAndPathText = (hostname + pathname + search).toLowerCase();
     PHISHING_KEYWORDS.forEach(keyword => {
-      // Ignore brand keyword matching when analyzing the official root domain itself (e.g. google in google.com)
-      const isOfficialBrandKeyword = (keyword === domain.toLowerCase()) && (isWhitelistedRoot || isStandardSubdomain);
-
-      if (!isOfficialBrandKeyword && domainAndPathText.includes(keyword)) {
+      if (domainAndPathText.includes(keyword) && keyword !== domain) {
         if (!telemetry.phishing_keywords_found.includes(keyword)) {
-          // If whitelisted root domain with standard path, don't penalize standard login paths
-          if (!telemetry.is_whitelisted_domain) {
-            telemetry.phishing_keywords_found.push(keyword);
-          }
+          telemetry.phishing_keywords_found.push(keyword);
         }
       }
     });
 
-    if (telemetry.phishing_keywords_found.length > 0 && threatCategories.size === 0 && !telemetry.is_whitelisted_domain) {
+    if (telemetry.phishing_keywords_found.length > 0 && !typosquattingDetected) {
       riskScore += 15;
       threatCategories.add('Credential Harvesting Pattern');
-      summaryReasons.push('Security keywords detected in domain or path parameters.');
+      summaryReasons.push('Target credential-harvesting keywords found in URL path.');
     }
-  }
 
-  // URL Length & Query Analysis
-  if (formattedUrl.length > 100 && !telemetry.is_whitelisted_domain) {
-    riskScore += 20;
-    telemetry.url_length_flag = 'HIGH Risk';
-    threatCategories.add('Excessive URL Length');
-    summaryReasons.push('Excessively long URL (> 100 chars), often designed to hide malicious target strings.');
-  } else if (formattedUrl.length > 75 && !telemetry.is_whitelisted_domain) {
-    riskScore += 10;
-    telemetry.url_length_flag = 'MODERATE';
-    summaryReasons.push('Long URL length (> 75 chars).');
-  }
-
-  // Obfuscated @ Symbol Check
-  if (formattedUrl.includes('@')) {
-    riskScore += 35;
-    threatCategories.add('URI Userinfo Obfuscation');
-    summaryReasons.push('Contains an "@" symbol, which can force browser authentication redirection.');
-    telemetry.regex_matches.push({ rule: 'URI Userinfo Obfuscation', pattern: '@', matched: '@' });
-  }
-
-  // Query Base64 payload decoder attempt
-  searchParams.forEach((val, key) => {
-    if (val.length > 16 && /^[A-Za-z0-9+/=]+$/.test(val)) {
-      try {
-        const decoded = Buffer.from(val, 'base64').toString('utf-8');
-        if (/^https?:\/\//i.test(decoded) || decoded.includes('@')) {
-          telemetry.decoded_query_payloads.push({ param: key, raw: val, decoded });
-          riskScore += 20;
-          threatCategories.add('Base64 Encoded Payload');
-          summaryReasons.push(`Encoded Base64 redirect detected in query param '${key}'.`);
-        }
-      } catch (e) {
-        // Not valid Base64 string
+    // Base64 Payload Check (+20 pts)
+    searchParams.forEach((val, key) => {
+      if (val.length > 16 && /^[A-Za-z0-9+/=]+$/.test(val)) {
+        try {
+          const decoded = Buffer.from(val, 'base64').toString('utf-8');
+          if (/^https?:\/\//i.test(decoded) || decoded.includes('@')) {
+            telemetry.decoded_query_payloads.push({ param: key, raw: val, decoded });
+            riskScore += 20;
+            threatCategories.add('Base64 Encoded Payload');
+            summaryReasons.push(`Base64 payload detected in query param '${key}'.`);
+          }
+        } catch (e) {}
       }
-    }
-  });
-
-  // Whitelisted Major Domain Adjustment
-  if (telemetry.is_whitelisted_domain && threatCategories.size === 0) {
-    riskScore = 0;
+    });
   }
 
-  // Cap risk score at 100
+  // Cap final score at 100
   riskScore = Math.min(riskScore, 100);
 
   let riskLevel = 'Safe';
@@ -282,17 +325,13 @@ function analyzeUrl(urlString) {
 
   if (riskScore <= 25) {
     riskLevel = 'Safe';
-    finalSummary = summaryReasons.length > 0 
-      ? summaryReasons.join(' ') 
-      : (telemetry.is_whitelisted_domain 
-          ? 'Verified authentic major root domain. No security risk detected.' 
-          : 'No significant risk factors detected. The URL appears safe based on Level 1 & 2 heuristics.');
+    finalSummary = summaryReasons.length > 0 ? summaryReasons.join(' ') : 'No significant threat factors detected. The URL appears safe.';
   } else if (riskScore <= 65) {
     riskLevel = 'Caution';
     finalSummary = 'Proceed with caution. ' + summaryReasons.join(' ');
   } else {
     riskLevel = 'High Risk';
-    finalSummary = 'CRITICAL RISK: High probability of phishing or credential harvesting! ' + summaryReasons.join(' ');
+    finalSummary = 'CRITICAL RISK: High probability of phishing or brand impersonation! ' + summaryReasons.join(' ');
   }
 
   return {
@@ -306,9 +345,10 @@ function analyzeUrl(urlString) {
       domain_breakdown: {
         protocol,
         hostname,
-        subdomain: subdomains.join('.') || '(None)',
-        domain: domain || hostname,
-        tld: tld || '(None)',
+        subdomain,
+        domain,
+        apex_domain: apexDomain,
+        tld,
         path: pathname || '/',
         port: port || (protocol === 'https:' ? '443' : '80'),
         query_params_count: Array.from(searchParams.keys()).length
@@ -319,5 +359,6 @@ function analyzeUrl(urlString) {
 }
 
 module.exports = {
-  analyzeUrl
+  analyzeUrl,
+  levenshteinDistance
 };
