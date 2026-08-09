@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <filter id="glow4" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="50" cy="50" r="46" fill="#071a15" stroke="url(#grad4)" stroke-width="2" />
+
+  <!-- Outer Firewall Arc Ring -->
+  <circle cx="50" cy="50" r="40" fill="none" stroke="url(#grad4)" stroke-width="2" stroke-dasharray="14,6" opacity="0.6" />
+  
+  <!-- Metallic Shield Path -->
+  <path d="M 50 18 L 78 28 C 78 56 50 78 50 78 C 50 78 22 56 22 28 Z" fill="#071a15" stroke="#E2E8F0" stroke-width="3" filter="url(#glow4)" />
+  <path d="M 50 22 L 72 30 C 72 54 50 72 50 72 C 50 72 28 54 28 30 Z" fill="url(#grad4)" opacity="0.8" />
+
+  <!-- Center Lightning Bolt -->
+  <path d="M 52 28 L 38 48 H 50 L 46 68 L 64 44 H 50 Z" fill="#ffffff" filter="url(#glow4)" stroke="#10B981" stroke-width="1" />
+</svg>

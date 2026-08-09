@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F2FE" />
+      <stop offset="100%" stop-color="#4FACFE" />
+    </linearGradient>
+    <filter id="glow1" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="50" cy="50" r="46" fill="#0b1329" stroke="url(#grad1)" stroke-width="2" />
+
+  <!-- Circuit Traces -->
+  <path d="M 15 50 L 30 50 M 50 15 L 50 30 M 85 50 L 70 50 M 50 85 L 50 70" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" opacity="0.6" />
+  <circle cx="15" cy="50" r="2.5" fill="#00F2FE" />
+  <circle cx="50" cy="15" r="2.5" fill="#00F2FE" />
+  <circle cx="85" cy="50" r="2.5" fill="#00F2FE" />
+  <circle cx="50" cy="85" r="2.5" fill="#00F2FE" />
+
+  <!-- Gear Teeth -->
+  <g stroke="url(#grad1)" stroke-width="2" fill="none" opacity="0.8">
+    <circle cx="45" cy="45" r="20" stroke-dasharray="4,3" stroke-width="3" />
+  </g>
+
+  <!-- Magnifying Glass Rim -->
+  <circle cx="43" cy="43" r="22" fill="none" stroke="url(#grad1)" stroke-width="5" filter="url(#glow1)" />
+
+  <!-- Magnifying Glass Handle -->
+  <path d="M 58 58 L 76 76" stroke="url(#grad1)" stroke-width="7" stroke-linecap="round" filter="url(#glow1)" />
+
+  <!-- Center Checkmark -->
+  <path d="M 33 43 L 40 50 L 53 36" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

@@ -17,6 +17,13 @@ const closeHistoryBtn = document.getElementById('closeHistoryBtn');
 const clearHistoryBtn = document.getElementById('clearHistoryBtn');
 const historyList = document.getElementById('historyList');
 
+// Icon Portfolio Elements
+const iconPortfolioBtn = document.getElementById('iconPortfolioBtn');
+const iconModal = document.getElementById('iconModal');
+const closeIconBtn = document.getElementById('closeIconBtn');
+const dynamicFavicon = document.getElementById('dynamicFavicon');
+const headerBrandImg = document.getElementById('headerBrandImg');
+
 // Persona Views & Tabs
 const personaTabs = document.getElementById('personaTabs');
 const userLayerView = document.getElementById('userLayerView');
@@ -164,6 +171,56 @@ function setupEventListeners() {
     localStorage.setItem('phish_scan_history', JSON.stringify([]));
     updateHistoryUI();
   });
+
+  // Icon Portfolio Modal
+  if (iconPortfolioBtn && iconModal) {
+    iconPortfolioBtn.addEventListener('click', () => iconModal.classList.remove('hidden'));
+    closeIconBtn.addEventListener('click', () => iconModal.classList.add('hidden'));
+    iconModal.addEventListener('click', (e) => { if (e.target === iconModal) iconModal.classList.add('hidden'); });
+
+    document.querySelectorAll('.approve-deploy-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const iconPath = e.target.getAttribute('data-icon-path');
+        const iconName = e.target.getAttribute('data-icon-name');
+        deployActiveIcon(iconPath, iconName);
+      });
+    });
+  }
+
+  // Restore Saved Icon Preference
+  const savedIcon = localStorage.getItem('phish_active_icon');
+  if (savedIcon) {
+    deployActiveIcon(savedIcon, 'Active Icon');
+  }
+}
+
+// Deploy Active Icon Handler
+function deployActiveIcon(iconPath, iconName) {
+  if (!iconPath) return;
+
+  if (headerBrandImg) {
+    headerBrandImg.src = iconPath;
+  }
+
+  if (dynamicFavicon) {
+    dynamicFavicon.href = iconPath;
+  }
+
+  document.querySelectorAll('.icon-card').forEach(card => card.classList.remove('active-card'));
+  document.querySelectorAll('.approve-deploy-btn').forEach(btn => {
+    btn.classList.remove('active-btn');
+    btn.textContent = 'Approve & Deploy';
+  });
+
+  const activeBtn = document.querySelector(`.approve-deploy-btn[data-icon-path="${iconPath}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add('active-btn');
+    activeBtn.textContent = '✓ Active Icon';
+    const card = activeBtn.closest('.icon-card');
+    if (card) card.classList.add('active-card');
+  }
+
+  localStorage.setItem('phish_active_icon', iconPath);
 }
 
 // Main Analysis Call

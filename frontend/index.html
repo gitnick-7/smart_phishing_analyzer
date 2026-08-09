@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link id="dynamicFavicon" rel="icon" type="image/svg+xml" href="icons/level5_evolving_tactician.svg">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,12 +19,8 @@
     <!-- Header -->
     <header class="app-header">
       <div class="brand">
-        <div class="shield-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            <path d="M12 8v4"></path>
-            <path d="M12 16h.01"></path>
-          </svg>
+        <div class="shield-icon" id="headerBrandLogo">
+          <img id="headerBrandImg" src="icons/level5_evolving_tactician.svg" alt="Active Icon" width="36" height="36" />
         </div>
         <div>
           <h1>Smart Phishing &amp; URL Analyzer <span class="v5-badge">v5.0 AUTONOMIC</span></h1>
@@ -32,6 +29,10 @@
       </div>
 
       <div class="header-actions">
+        <button class="icon-portfolio-btn" id="iconPortfolioBtn" title="Select Agent Icon Portfolio">
+          🎨 Agent Icons
+        </button>
+
         <button class="history-toggle-btn" id="historyToggleBtn" title="View Recent Scans">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
@@ -376,6 +377,141 @@
       </div>
       <div class="history-list" id="historyList">
         <p class="empty-history">No recent scans recorded in this session.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Icon Selection Panel Modal -->
+  <div class="icon-modal hidden" id="iconModal">
+    <div class="icon-modal-content glass-card">
+      <div class="icon-modal-header">
+        <div>
+          <h3><span class="code-icon">🎨</span> Agent Icon Selection Panel</h3>
+          <p class="icon-modal-subtitle">Preview & deploy SVG vector icons for Threat Intelligence Levels 1 through 5</p>
+        </div>
+        <button class="close-icon-btn" id="closeIconBtn">&times;</button>
+      </div>
+
+      <div class="icon-grid">
+        <!-- Icon 1 Card -->
+        <div class="icon-card" data-icon-id="level1">
+          <div class="icon-card-header">
+            <span class="level-badge level-1">LEVEL 1</span>
+            <h4>The Logic Probe</h4>
+          </div>
+          <div class="icon-preview-box">
+            <img src="icons/level1_logic_probe.svg" alt="The Logic Probe" class="main-svg-preview" />
+          </div>
+          <div class="favicon-preview-container">
+            <span class="fav-label">Favicon Preview:</span>
+            <div class="browser-tab-sim">
+              <img src="icons/level1_logic_probe.svg" alt="16x16" width="16" height="16" />
+              <span>16x16</span>
+            </div>
+            <div class="browser-tab-sim">
+              <img src="icons/level1_logic_probe.svg" alt="32x32" width="24" height="24" />
+              <span>32x32</span>
+            </div>
+          </div>
+          <p class="icon-desc">Heuristic analyst probe with circuit & checkmark logic.</p>
+          <button class="approve-deploy-btn" data-icon-path="icons/level1_logic_probe.svg" data-icon-name="The Logic Probe">Approve &amp; Deploy</button>
+        </div>
+
+        <!-- Icon 2 Card -->
+        <div class="icon-card" data-icon-id="level2">
+          <div class="icon-card-header">
+            <span class="level-badge level-2">LEVEL 2</span>
+            <h4>The Cyber-Sentry</h4>
+          </div>
+          <div class="icon-preview-box">
+            <img src="icons/level2_cyber_sentry.svg" alt="The Cyber-Sentry" class="main-svg-preview" />
+          </div>
+          <div class="favicon-preview-container">
+            <span class="fav-label">Favicon Preview:</span>
+            <div class="browser-tab-sim">
+              <img src="icons/level2_cyber_sentry.svg" alt="16x16" width="16" height="16" />
+              <span>16x16</span>
+            </div>
+            <div class="browser-tab-sim">
+              <img src="icons/level2_cyber_sentry.svg" alt="32x32" width="24" height="24" />
+              <span>32x32</span>
+            </div>
+          </div>
+          <p class="icon-desc">Scanning radar eye with satellite intelligence nodes.</p>
+          <button class="approve-deploy-btn" data-icon-path="icons/level2_cyber_sentry.svg" data-icon-name="The Cyber-Sentry">Approve &amp; Deploy</button>
+        </div>
+
+        <!-- Icon 3 Card -->
+        <div class="icon-card" data-icon-id="level3">
+          <div class="icon-card-header">
+            <span class="level-badge level-3">LEVEL 3</span>
+            <h4>The Virtual Container</h4>
+          </div>
+          <div class="icon-preview-box">
+            <img src="icons/level3_virtual_container.svg" alt="The Virtual Container" class="main-svg-preview" />
+          </div>
+          <div class="favicon-preview-container">
+            <span class="fav-label">Favicon Preview:</span>
+            <div class="browser-tab-sim">
+              <img src="icons/level3_virtual_container.svg" alt="16x16" width="16" height="16" />
+              <span>16x16</span>
+            </div>
+            <div class="browser-tab-sim">
+              <img src="icons/level3_virtual_container.svg" alt="32x32" width="24" height="24" />
+              <span>32x32</span>
+            </div>
+          </div>
+          <p class="icon-desc">3D isometric glass cube enclosing sandboxed node locks.</p>
+          <button class="approve-deploy-btn" data-icon-path="icons/level3_virtual_container.svg" data-icon-name="The Virtual Container">Approve &amp; Deploy</button>
+        </div>
+
+        <!-- Icon 4 Card -->
+        <div class="icon-card" data-icon-id="level4">
+          <div class="icon-card-header">
+            <span class="level-badge level-4">LEVEL 4</span>
+            <h4>The Active Defender</h4>
+          </div>
+          <div class="icon-preview-box">
+            <img src="icons/level4_active_defender.svg" alt="The Active Defender" class="main-svg-preview" />
+          </div>
+          <div class="favicon-preview-container">
+            <span class="fav-label">Favicon Preview:</span>
+            <div class="browser-tab-sim">
+              <img src="icons/level4_active_defender.svg" alt="16x16" width="16" height="16" />
+              <span>16x16</span>
+            </div>
+            <div class="browser-tab-sim">
+              <img src="icons/level4_active_defender.svg" alt="32x32" width="24" height="24" />
+              <span>32x32</span>
+            </div>
+          </div>
+          <p class="icon-desc">Metallic shield enclosing a firewall lightning core.</p>
+          <button class="approve-deploy-btn" data-icon-path="icons/level4_active_defender.svg" data-icon-name="The Active Defender">Approve &amp; Deploy</button>
+        </div>
+
+        <!-- Icon 5 Card -->
+        <div class="icon-card active-card" data-icon-id="level5">
+          <div class="icon-card-header">
+            <span class="level-badge level-5">LEVEL 5</span>
+            <h4>The Evolving Tactician</h4>
+          </div>
+          <div class="icon-preview-box">
+            <img src="icons/level5_evolving_tactician.svg" alt="The Evolving Tactician" class="main-svg-preview" />
+          </div>
+          <div class="favicon-preview-container">
+            <span class="fav-label">Favicon Preview:</span>
+            <div class="browser-tab-sim">
+              <img src="icons/level5_evolving_tactician.svg" alt="16x16" width="16" height="16" />
+              <span>16x16</span>
+            </div>
+            <div class="browser-tab-sim">
+              <img src="icons/level5_evolving_tactician.svg" alt="32x32" width="24" height="24" />
+              <span>32x32</span>
+            </div>
+          </div>
+          <p class="icon-desc">Adversarial Red/Blue scale with central AI gold core.</p>
+          <button class="approve-deploy-btn active-btn" data-icon-path="icons/level5_evolving_tactician.svg" data-icon-name="The Evolving Tactician">✓ Active Icon</button>
+        </div>
       </div>
     </div>
   </div>
