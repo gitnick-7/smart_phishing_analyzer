@@ -40,64 +40,95 @@
   <div class="cyber-bg-overlay"></div>
   <div class="grid-pattern"></div>
 
-  <!-- Mobile Top Header -->
-  <header class="lg:hidden flex items-center justify-between px-4 py-3 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg bg-cyan-950/50 border border-cyan-500/30 flex items-center justify-center shadow-lg shadow-cyan-500/10">
-        <img id="mobileHeaderBrandImg" src="icons/level2_cyber_sentry.svg" alt="Icon" class="w-6 h-6" />
+  <!-- UNIFIED CYBERNETIC HUD NAVBAR -->
+  <header class="w-full bg-slate-950/90 backdrop-blur-xl border-b border-cyan-500/20 sticky top-0 z-30 shadow-2xl shadow-cyan-950/30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+      <!-- Brand & Icon Identity -->
+      <div class="flex items-center gap-3.5">
+        <div class="relative group cursor-pointer" id="headerBrandLogo" title="Click to change Agent Icon">
+          <div class="w-11 h-11 rounded-xl bg-slate-900 border border-cyan-500/40 p-1.5 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:border-cyan-400 group-hover:shadow-cyan-400/40 transition-all duration-300">
+            <img id="headerBrandImg" src="icons/level2_cyber_sentry.svg" alt="Active Icon" class="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(0,242,254,0.5)]" />
+          </div>
+          <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-slate-950 animate-pulse"></span>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="font-black text-base sm:text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300">
+              Smart Phishing <span class="text-slate-100 font-extrabold">&amp; URL Analyzer</span>
+            </h1>
+            <span class="px-2 py-0.5 text-[10px] font-mono font-bold rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-sm shadow-cyan-500/20">
+              v5.0 AUTONOMIC
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-medium hidden sm:flex items-center gap-2 mt-0.5">
+            <span>🛡️ Level 5 Threat Intelligence Engine</span>
+            <span>&bull;</span>
+            <span class="text-cyan-400 font-semibold">Cyber-Sentry Active</span>
+            <span>&bull;</span>
+            <span>Red/Blue Evasion Defense</span>
+          </p>
+          <p class="text-[10px] text-slate-400 font-medium sm:hidden mt-0.5">
+            Cyber-Sentry Threat Intelligence
+          </p>
+        </div>
       </div>
-      <div>
-        <h1 class="font-extrabold text-sm text-cyan-400 leading-tight">PhishAnalyzer <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono">v5.0</span></h1>
-        <p class="text-[10px] text-slate-400">Cyber-Sentry Threat Intelligence</p>
-      </div>
-    </div>
-    <div class="flex items-center gap-2">
-      <div class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px]" id="mobileBackendStatus">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span class="text-slate-300 font-mono">Online</span>
+
+      <!-- Action & Telemetry HUD Controls -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Live API Engine Status Badge -->
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs font-mono text-emerald-400 shadow-inner" id="backendStatus">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="status-text font-bold">ENGINE: ONLINE</span>
+        </div>
+
+        <!-- Quick Agent Icon Selector Trigger -->
+        <button id="iconPortfolioBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/10 to-red-500/10 border border-amber-500/30 text-amber-300 hover:text-amber-200 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/20 transition-all text-xs font-bold">
+          <span class="text-sm">🎨</span>
+          <span class="hidden sm:inline">Agent Icons</span>
+        </button>
+
+        <!-- Quick Scan History Counter Trigger -->
+        <button id="historyToggleBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200 hover:text-white hover:border-cyan-400/50 transition-all text-xs font-bold">
+          <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span class="hidden sm:inline">History</span>
+          <span class="px-1.5 py-0.2 rounded-md bg-cyan-500/20 text-cyan-300 font-mono text-[11px]" id="historyCount">0</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-8 relative z-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 lg:pt-8 relative z-10">
     <div class="lg:grid lg:grid-cols-12 lg:gap-8">
 
       <!-- DESKTOP LEFT SIDEBAR -->
       <aside class="hidden lg:block lg:col-span-3 space-y-6">
-        <!-- Desktop Brand Header Card -->
+        <!-- Desktop Platform Info Card -->
         <div class="glass-card p-5 space-y-4">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-cyan-950/60 border border-cyan-500/40 flex items-center justify-center shadow-xl shadow-cyan-500/20" id="headerBrandLogo">
-              <img id="headerBrandImg" src="icons/level2_cyber_sentry.svg" alt="Active Icon" class="w-9 h-9 filter drop-shadow-md" />
-            </div>
-            <div>
-              <h1 class="font-extrabold text-lg tracking-tight text-cyan-400 leading-snug">Smart Phishing &amp; URL Analyzer</h1>
-              <span class="inline-block mt-1 px-2.5 py-0.5 text-xs font-mono font-semibold rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">v5.0 AUTONOMIC</span>
-            </div>
+          <div class="space-y-1.5 border-b border-slate-800 pb-3">
+            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Platform Capabilities
+            </h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Level 5 Autonomic Threat Engine featuring live API stubs, headless redirect tracing, active firewall generation, and adversarial benchmark testing.
+            </p>
           </div>
-          <p class="text-xs text-slate-400 leading-relaxed border-t border-slate-800/80 pt-3">
-            Level 5 Threat Intelligence, Redirect Sandbox, Active Defense Firewall Exporter &amp; Red/Blue Loop.
-          </p>
 
-          <div class="pt-2 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80" id="backendStatus">
-            <span class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span class="status-text font-mono text-emerald-400">API Connected</span>
-            </span>
-            <span class="text-[10px] font-mono text-slate-500">PORT 5000</span>
+          <div class="space-y-2 text-xs font-mono">
+            <div class="flex items-center justify-between text-slate-400">
+              <span>Threat Intel:</span>
+              <span class="text-emerald-400 font-bold">v3 / v5 APIs</span>
+            </div>
+            <div class="flex items-center justify-between text-slate-400">
+              <span>Sandbox:</span>
+              <span class="text-purple-400 font-bold">Headless Trace</span>
+            </div>
+            <div class="flex items-center justify-between text-slate-400">
+              <span>Defense Mode:</span>
+              <span class="text-cyan-400 font-bold">Active Sinkhole</span>
+            </div>
           </div>
         </div>
-
-        <!-- Desktop Action Buttons -->
-        <div class="space-y-3">
-          <button id="iconPortfolioBtn" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-red-500/10 border border-amber-500/30 text-amber-300 hover:text-amber-200 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/10 transition-all font-semibold text-xs">
-            <span class="flex items-center gap-2">
-              <span class="text-base">🎨</span> Select Agent Icon
-            </span>
-            <span class="text-[10px] font-mono bg-amber-500/20 px-2 py-0.5 rounded">5 SVG Icons</span>
-          </button>
-
-          <button id="historyToggleBtn" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-all font-medium text-xs">
             <span class="flex items-center gap-2">
               <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               Scan History
