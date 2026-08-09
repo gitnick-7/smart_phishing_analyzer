@@ -88,8 +88,20 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.search-section {
+  background: linear-gradient(-45deg, rgba(15, 23, 42, 0.85), rgba(7, 10, 18, 0.95), rgba(9, 26, 46, 0.9), rgba(15, 23, 42, 0.85)) !important;
+  background-size: 400% 400% !important;
+  animation: gradientShift 12s ease infinite !important;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
