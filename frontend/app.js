@@ -195,7 +195,7 @@ function setupEventListeners() {
   initParticleBackground();
 }
 
-// Live Ambient Interactive Canvas Particle Background Generator
+// Eye-Catching Interactive Live Canvas Plasma Engine
 function initParticleBackground() {
   const canvas = document.getElementById('bgCanvas');
   if (!canvas) return;
@@ -209,23 +209,46 @@ function initParticleBackground() {
     height = canvas.height = window.innerHeight;
   });
 
-  const mouse = { x: null, y: null, radius: 170 };
+  const mouse = { x: null, y: null, radius: 180 };
+  const mouseTrail = [];
+  const supernovas = [];
   const shockwaves = [];
-  
-  // Dynamic Color Palette Cycles
+
+  // Color Palette Cycles
   const colorPalettes = [
-    ['#00f2fe', '#3b82f6', '#00c6ff'], // Cyber Cyan & Blue
-    ['#a855f7', '#6366f1', '#ec4899'], // Neon Purple & Pink
-    ['#10b981', '#00f2fe', '#059669'], // Emerald & Cyan
-    ['#f59e0b', '#ef4444', '#fbbf24'], // Gold & Crimson
-    ['#3b82f6', '#a855f7', '#00f2fe']  // Indigo & Cyan
+    ['#00f2fe', '#3b82f6', '#00c6ff', '#60a5fa'], // Cyber Cyan & Electric Blue
+    ['#a855f7', '#ec4899', '#8b5cf6', '#f43f5e'], // Neon Purple & Pink
+    ['#10b981', '#00f2fe', '#34d399', '#059669'], // Emerald & Cyan
+    ['#f59e0b', '#ef4444', '#fbbf24', '#f97316'], // Gold & Crimson Burst
+    ['#6366f1', '#a855f7', '#00f2fe', '#818cf8']  // Indigo, Purple & Cyan
   ];
   let currentPaletteIdx = 0;
 
-  // Track Mouse Hover Sensitivity
+  // Background Ambient Plasma Orbs
+  const plasmaOrbs = [
+    { x: width * 0.2, y: height * 0.3, vx: 0.2, vy: 0.3, radius: 180, color: 'rgba(0, 242, 254, 0.08)' },
+    { x: width * 0.8, y: height * 0.7, vx: -0.25, vy: -0.2, radius: 220, color: 'rgba(168, 85, 247, 0.07)' },
+    { x: width * 0.5, y: height * 0.5, vx: 0.15, vy: -0.25, radius: 150, color: 'rgba(59, 130, 246, 0.08)' }
+  ];
+
+  // Mouse Hover Sensitivity & Trail Generator
   window.addEventListener('mousemove', (e) => {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
+
+    // Add trail sparks on hover
+    if (Math.random() < 0.6) {
+      const activeColors = colorPalettes[currentPaletteIdx];
+      mouseTrail.push({
+        x: e.clientX + (Math.random() - 0.5) * 10,
+        y: e.clientY + (Math.random() - 0.5) * 10,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5,
+        radius: Math.random() * 3 + 1,
+        alpha: 0.9,
+        color: activeColors[Math.floor(Math.random() * activeColors.length)]
+      });
+    }
   });
 
   window.addEventListener('mouseleave', () => {
@@ -233,37 +256,56 @@ function initParticleBackground() {
     mouse.y = null;
   });
 
-  // Track Click Sensitivity for Shockwave Bursts & Palette Cycles
+  // Click Supernova Particle Explosion & Color Palette Cycle
   window.addEventListener('click', (e) => {
     currentPaletteIdx = (currentPaletteIdx + 1) % colorPalettes.length;
     const activeColors = colorPalettes[currentPaletteIdx];
 
+    // Update node particle colors
     particles.forEach(p => {
       p.color = activeColors[Math.floor(Math.random() * activeColors.length)];
     });
 
+    // Expanding Shockwave Ring
     shockwaves.push({
       x: e.clientX,
       y: e.clientY,
       radius: 5,
-      maxRadius: 180,
-      opacity: 0.8,
+      maxRadius: 220,
+      opacity: 0.85,
       color: activeColors[0]
     });
 
+    // Supernova 360-degree Spark Explosion (30 particles)
+    for (let i = 0; i < 30; i++) {
+      const angle = (Math.PI * 2 / 30) * i + (Math.random() - 0.5) * 0.2;
+      const speed = Math.random() * 6 + 2;
+      supernovas.push({
+        x: e.clientX,
+        y: e.clientY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        radius: Math.random() * 3.5 + 1.5,
+        alpha: 1.0,
+        color: activeColors[Math.floor(Math.random() * activeColors.length)]
+      });
+    }
+
+    // Repel main particles outward
     particles.forEach(p => {
       const dx = p.x - e.clientX;
       const dy = p.y - e.clientY;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 180 && dist > 0) {
-        const force = (180 - dist) / 180;
-        p.vx += (dx / dist) * force * 5;
-        p.vy += (dy / dist) * force * 5;
+      if (dist < 220 && dist > 0) {
+        const force = (220 - dist) / 220;
+        p.vx += (dx / dist) * force * 7;
+        p.vy += (dy / dist) * force * 7;
       }
     });
   });
 
-  const particleCount = Math.min(Math.floor(window.innerWidth / 20), 65);
+  // Base Network Particles
+  const particleCount = Math.min(Math.floor(window.innerWidth / 18), 70);
   const particles = [];
 
   for (let i = 0; i < particleCount; i++) {
@@ -271,9 +313,9 @@ function initParticleBackground() {
     particles.push({
       x: Math.random() * width,
       y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.6,
-      vy: (Math.random() - 0.5) * 0.6,
-      radius: Math.random() * 2.5 + 1,
+      vx: (Math.random() - 0.5) * 0.7,
+      vy: (Math.random() - 0.5) * 0.7,
+      radius: Math.random() * 3 + 1,
       color: activeColors[Math.floor(Math.random() * activeColors.length)]
     });
   }
@@ -281,10 +323,73 @@ function initParticleBackground() {
   function renderFrame() {
     ctx.clearRect(0, 0, width, height);
 
-    // Render & Expand Shockwaves
+    // 1. Draw Ambient Glowing Plasma Orbs
+    plasmaOrbs.forEach(orb => {
+      orb.x += orb.vx;
+      orb.y += orb.vy;
+
+      if (orb.x < -100 || orb.x > width + 100) orb.vx *= -1;
+      if (orb.y < -100 || orb.y > height + 100) orb.vy *= -1;
+
+      const grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius);
+      grad.addColorStop(0, orb.color);
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // 2. Render Mouse Trail Sparks
+    for (let i = mouseTrail.length - 1; i >= 0; i--) {
+      const sp = mouseTrail[i];
+      sp.x += sp.vx;
+      sp.y += sp.vy;
+      sp.alpha -= 0.025;
+
+      if (sp.alpha <= 0) {
+        mouseTrail.splice(i, 1);
+        continue;
+      }
+
+      ctx.beginPath();
+      ctx.arc(sp.x, sp.y, sp.radius, 0, Math.PI * 2);
+      ctx.fillStyle = sp.color;
+      ctx.globalAlpha = sp.alpha;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = sp.color;
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+    }
+
+    // 3. Render Click Supernova Explosion Sparks
+    for (let i = supernovas.length - 1; i >= 0; i--) {
+      const sn = supernovas[i];
+      sn.x += sn.vx;
+      sn.y += sn.vy;
+      sn.vx *= 0.95;
+      sn.vy *= 0.95;
+      sn.alpha -= 0.02;
+
+      if (sn.alpha <= 0) {
+        supernovas.splice(i, 1);
+        continue;
+      }
+
+      ctx.beginPath();
+      ctx.arc(sn.x, sn.y, sn.radius, 0, Math.PI * 2);
+      ctx.fillStyle = sn.color;
+      ctx.globalAlpha = sn.alpha;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = sn.color;
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+    }
+
+    // 4. Render Expanding Shockwaves
     for (let i = shockwaves.length - 1; i >= 0; i--) {
       const sw = shockwaves[i];
-      sw.radius += 6;
+      sw.radius += 7;
       sw.opacity -= 0.025;
 
       if (sw.opacity <= 0 || sw.radius >= sw.maxRadius) {
@@ -296,16 +401,16 @@ function initParticleBackground() {
       ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
       ctx.strokeStyle = sw.color;
       ctx.globalAlpha = sw.opacity;
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 3;
       ctx.stroke();
       ctx.globalAlpha = 1.0;
     }
 
-    // Render & Update Particles
+    // 5. Render Core Network Particles & Laser Links
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
 
-      // Mouse Repulsion & Cursor Constellation Link
+      // Mouse Repulsion & Laser Tendril Connection
       if (mouse.x !== null && mouse.y !== null) {
         const dx = p.x - mouse.x;
         const dy = p.y - mouse.y;
@@ -313,15 +418,20 @@ function initParticleBackground() {
 
         if (dist < mouse.radius && dist > 0) {
           const force = (mouse.radius - dist) / mouse.radius;
-          p.x += (dx / dist) * force * 3.5;
-          p.y += (dy / dist) * force * 3.5;
+          p.x += (dx / dist) * force * 4;
+          p.y += (dy / dist) * force * 4;
 
+          // Bright Glowing Laser Line to Cursor
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(mouse.x, mouse.y);
-          ctx.strokeStyle = `rgba(0, 242, 254, ${0.3 * force})`;
-          ctx.lineWidth = 1;
+          ctx.strokeStyle = p.color;
+          ctx.globalAlpha = 0.4 * force;
+          ctx.lineWidth = 1.5;
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = p.color;
           ctx.stroke();
+          ctx.globalAlpha = 1.0;
         }
       }
 
@@ -331,32 +441,36 @@ function initParticleBackground() {
       p.vx *= 0.98;
       p.vy *= 0.98;
 
-      if (Math.abs(p.vx) < 0.2) p.vx += (Math.random() - 0.5) * 0.2;
-      if (Math.abs(p.vy) < 0.2) p.vy += (Math.random() - 0.5) * 0.2;
+      if (Math.abs(p.vx) < 0.25) p.vx += (Math.random() - 0.5) * 0.25;
+      if (Math.abs(p.vy) < 0.25) p.vy += (Math.random() - 0.5) * 0.25;
 
       if (p.x < 0 || p.x > width) p.vx *= -1;
       if (p.y < 0 || p.y > height) p.vy *= -1;
 
+      // Draw Main Particle Node
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
       ctx.fillStyle = p.color;
-      ctx.shadowBlur = 8;
+      ctx.shadowBlur = 10;
       ctx.shadowColor = p.color;
       ctx.fill();
 
+      // Constellation Links Between Particles
       for (let j = i + 1; j < particles.length; j++) {
         const p2 = particles[j];
         const dx = p.x - p2.x;
         const dy = p.y - p2.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < 120) {
+        if (dist < 130) {
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = `rgba(0, 242, 254, ${0.15 * (1 - dist / 120)})`;
-          ctx.lineWidth = 0.8;
+          ctx.strokeStyle = p.color;
+          ctx.globalAlpha = 0.2 * (1 - dist / 130);
+          ctx.lineWidth = 0.9;
           ctx.stroke();
+          ctx.globalAlpha = 1.0;
         }
       }
     }
