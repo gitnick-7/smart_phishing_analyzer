@@ -8,7 +8,11 @@ const { URL } = require('url');
 async function lookupVirusTotal(urlString) {
   try {
     // Simulated VirusTotal v3 intelligence response based on domain heuristics
-    const parsed = new URL(urlString.startsWith('http') ? urlString : 'http://' + urlString);
+    let formattedUrl = urlString.trim();
+    if (!/^https?:\/\//i.test(formattedUrl)) {
+      formattedUrl = 'https://' + formattedUrl;
+    }
+    const parsed = new URL(formattedUrl);
     const domain = parsed.hostname;
     
     const isSuspicious = /(paypal|login|verify|account|bank|secure|xyz|top|info)/i.test(urlString);

@@ -4,9 +4,9 @@ const { URL } = require('url');
  * Level 3 Behavioral Sandboxing & Redirect Chain Tracer
  */
 async function traceRedirects(urlString) {
-  let currentUrl = urlString;
+  let currentUrl = urlString.trim();
   if (!/^https?:\/\//i.test(currentUrl)) {
-    currentUrl = 'http://' + currentUrl;
+    currentUrl = 'https://' + currentUrl;
   }
 
   const redirectChain = [];
