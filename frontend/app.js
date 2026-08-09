@@ -437,13 +437,24 @@ function saveToHistory(url, userLayer) {
 
 function updateHistoryUI() {
   historyCountEl.textContent = scanHistory.length;
-  if (scanHistory.length === 0) return;
   historyList.innerHTML = '';
+  
+  if (scanHistory.length === 0) {
+    historyList.innerHTML = '<p class="empty-history">No recent scans recorded in this session.</p>';
+    return;
+  }
+
   scanHistory.forEach(item => {
     const div = document.createElement('div');
     div.className = 'history-item';
-    div.innerHTML = `<div class="history-url">${escapeHtml(item.url)}</div><span class="risk-badge">${item.score}/100</span>`;
-    div.addEventListener('click', () => { urlInput.value = item.url; analyzeUrl(item.url); historyModal.classList.add('hidden'); });
+    const levelClass = item.level ? item.level.toLowerCase().split(' ')[0] : (item.score > 65 ? 'danger' : item.score > 25 ? 'caution' : 'safe');
+    div.innerHTML = `<div class="history-url">${escapeHtml(item.url)}</div><span class="risk-badge ${levelClass}">${item.score}/100</span>`;
+    div.addEventListener('click', () => { 
+      urlInput.value = item.url; 
+      clearBtn.style.display = 'block';
+      analyzeUrl(item.url); 
+      historyModal.classList.add('hidden'); 
+    });
     historyList.appendChild(div);
   });
 }
