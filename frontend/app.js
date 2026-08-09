@@ -195,7 +195,7 @@ function setupEventListeners() {
   initParticleBackground();
 }
 
-// Live Ambient Canvas Particle Background Generator
+// Live Ambient Interactive Canvas Particle Background Generator
 function initParticleBackground() {
   const canvas = document.getElementById('bgCanvas');
   if (!canvas) return;
@@ -209,27 +209,130 @@ function initParticleBackground() {
     height = canvas.height = window.innerHeight;
   });
 
-  const particleCount = Math.min(Math.floor(window.innerWidth / 24), 50);
+  const mouse = { x: null, y: null, radius: 170 };
+  const shockwaves = [];
+  
+  // Dynamic Color Palette Cycles
+  const colorPalettes = [
+    ['#00f2fe', '#3b82f6', '#00c6ff'], // Cyber Cyan & Blue
+    ['#a855f7', '#6366f1', '#ec4899'], // Neon Purple & Pink
+    ['#10b981', '#00f2fe', '#059669'], // Emerald & Cyan
+    ['#f59e0b', '#ef4444', '#fbbf24'], // Gold & Crimson
+    ['#3b82f6', '#a855f7', '#00f2fe']  // Indigo & Cyan
+  ];
+  let currentPaletteIdx = 0;
+
+  // Track Mouse Hover Sensitivity
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  window.addEventListener('mouseleave', () => {
+    mouse.x = null;
+    mouse.y = null;
+  });
+
+  // Track Click Sensitivity for Shockwave Bursts & Palette Cycles
+  window.addEventListener('click', (e) => {
+    currentPaletteIdx = (currentPaletteIdx + 1) % colorPalettes.length;
+    const activeColors = colorPalettes[currentPaletteIdx];
+
+    particles.forEach(p => {
+      p.color = activeColors[Math.floor(Math.random() * activeColors.length)];
+    });
+
+    shockwaves.push({
+      x: e.clientX,
+      y: e.clientY,
+      radius: 5,
+      maxRadius: 180,
+      opacity: 0.8,
+      color: activeColors[0]
+    });
+
+    particles.forEach(p => {
+      const dx = p.x - e.clientX;
+      const dy = p.y - e.clientY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 180 && dist > 0) {
+        const force = (180 - dist) / 180;
+        p.vx += (dx / dist) * force * 5;
+        p.vy += (dy / dist) * force * 5;
+      }
+    });
+  });
+
+  const particleCount = Math.min(Math.floor(window.innerWidth / 20), 65);
   const particles = [];
 
   for (let i = 0; i < particleCount; i++) {
+    const activeColors = colorPalettes[currentPaletteIdx];
     particles.push({
       x: Math.random() * width,
       y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.45,
-      vy: (Math.random() - 0.5) * 0.45,
-      radius: Math.random() * 2 + 1,
-      color: Math.random() > 0.5 ? '#00f2fe' : '#3b82f6'
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: (Math.random() - 0.5) * 0.6,
+      radius: Math.random() * 2.5 + 1,
+      color: activeColors[Math.floor(Math.random() * activeColors.length)]
     });
   }
 
   function renderFrame() {
     ctx.clearRect(0, 0, width, height);
 
+    // Render & Expand Shockwaves
+    for (let i = shockwaves.length - 1; i >= 0; i--) {
+      const sw = shockwaves[i];
+      sw.radius += 6;
+      sw.opacity -= 0.025;
+
+      if (sw.opacity <= 0 || sw.radius >= sw.maxRadius) {
+        shockwaves.splice(i, 1);
+        continue;
+      }
+
+      ctx.beginPath();
+      ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = sw.color;
+      ctx.globalAlpha = sw.opacity;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.globalAlpha = 1.0;
+    }
+
+    // Render & Update Particles
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
+
+      // Mouse Repulsion & Cursor Constellation Link
+      if (mouse.x !== null && mouse.y !== null) {
+        const dx = p.x - mouse.x;
+        const dy = p.y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < mouse.radius && dist > 0) {
+          const force = (mouse.radius - dist) / mouse.radius;
+          p.x += (dx / dist) * force * 3.5;
+          p.y += (dy / dist) * force * 3.5;
+
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mouse.x, mouse.y);
+          ctx.strokeStyle = `rgba(0, 242, 254, ${0.3 * force})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+
       p.x += p.vx;
       p.y += p.vy;
+
+      p.vx *= 0.98;
+      p.vy *= 0.98;
+
+      if (Math.abs(p.vx) < 0.2) p.vx += (Math.random() - 0.5) * 0.2;
+      if (Math.abs(p.vy) < 0.2) p.vy += (Math.random() - 0.5) * 0.2;
 
       if (p.x < 0 || p.x > width) p.vx *= -1;
       if (p.y < 0 || p.y > height) p.vy *= -1;
@@ -237,7 +340,7 @@ function initParticleBackground() {
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
       ctx.fillStyle = p.color;
-      ctx.shadowBlur = 6;
+      ctx.shadowBlur = 8;
       ctx.shadowColor = p.color;
       ctx.fill();
 
@@ -247,12 +350,12 @@ function initParticleBackground() {
         const dy = p.y - p2.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < 110) {
+        if (dist < 120) {
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = `rgba(0, 242, 254, ${0.15 * (1 - dist / 110)})`;
-          ctx.lineWidth = 0.75;
+          ctx.strokeStyle = `rgba(0, 242, 254, ${0.15 * (1 - dist / 120)})`;
+          ctx.lineWidth = 0.8;
           ctx.stroke();
         }
       }
