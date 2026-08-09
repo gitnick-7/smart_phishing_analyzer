@@ -1,375 +1,456 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Phishing & URL Analyzer v5.0 | Autonomic Threat Intelligence & Defense Platform</title>
+  <title>Smart Phishing &amp; URL Analyzer v5.0 | Autonomic Threat Intelligence Platform</title>
   <meta name="description" content="Level 5 Autonomic Threat Intelligence & Defense Platform featuring live threat intel, sandboxed redirect node mapping, active defense firewall payload generator, and Red/Blue adversarial benchmarking.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link id="dynamicFavicon" rel="icon" type="image/svg+xml" href="icons/level5_evolving_tactician.svg">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyberDark: '#070a12',
+            cyberCard: 'rgba(15, 23, 42, 0.75)',
+            cyberCyan: '#00f2fe',
+            cyberGold: '#f59e0b',
+            cyberGreen: '#10b981',
+            cyberRed: '#ef4444',
+            cyberPurple: '#a855f7'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="bg-[#070a12] text-slate-100 font-sans min-h-screen relative antialiased selection:bg-cyan-500 selection:text-black pb-20 lg:pb-8">
   <div class="cyber-bg-overlay"></div>
   <div class="grid-pattern"></div>
 
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="brand">
-        <div class="shield-icon" id="headerBrandLogo">
-          <img id="headerBrandImg" src="icons/level5_evolving_tactician.svg" alt="Active Icon" width="36" height="36" />
-        </div>
-        <div>
-          <h1>Smart Phishing &amp; URL Analyzer <span class="v5-badge">v5.0 AUTONOMIC</span></h1>
-          <p class="subtitle">Level 5 Threat Intelligence &bull; Redirect Sandbox Node Map &bull; Active Defense &bull; Red/Blue Loop</p>
-        </div>
+  <!-- Mobile Top Header -->
+  <header class="lg:hidden flex items-center justify-between px-4 py-3 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-cyan-950/50 border border-cyan-500/30 flex items-center justify-center shadow-lg shadow-cyan-500/10">
+        <img id="mobileHeaderBrandImg" src="icons/level5_evolving_tactician.svg" alt="Icon" class="w-6 h-6" />
       </div>
-
-      <div class="header-actions">
-        <button class="icon-portfolio-btn" id="iconPortfolioBtn" title="Select Agent Icon Portfolio">
-          🎨 Agent Icons
-        </button>
-
-        <button class="history-toggle-btn" id="historyToggleBtn" title="View Recent Scans">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-          History (<span id="historyCount">0</span>)
-        </button>
-
-        <div class="backend-status" id="backendStatus">
-          <span class="status-dot"></span>
-          <span class="status-text">Backend: Connecting...</span>
-        </div>
+      <div>
+        <h1 class="font-extrabold text-sm text-amber-400 leading-tight">PhishAnalyzer <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono">v5.0</span></h1>
+        <p class="text-[10px] text-slate-400">Autonomic Threat Intelligence</p>
       </div>
-    </header>
-
-    <!-- Main URL Search Section -->
-    <section class="search-section glass-card">
-      <form id="urlForm" class="search-form">
-        <div class="input-wrapper">
-          <div class="input-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="2" y1="12" x2="22" y2="12"></line>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </svg>
-          </div>
-          <input type="text" id="urlInput" placeholder="Paste suspect URL here (e.g. http://login.paypal.verify-account.info/auth)..." required autocomplete="off">
-          <button type="button" class="clear-btn" id="clearBtn" title="Clear input">&times;</button>
-        </div>
-        <button type="submit" class="submit-btn" id="submitBtn">
-          <span class="btn-text">Analyze Threat</span>
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </button>
-      </form>
-
-      <!-- Categorized Preset Scenarios -->
-      <div class="presets-container">
-        <span class="presets-label">Quick Test Scenarios:</span>
-        <div class="preset-buttons">
-          <button class="preset-btn safe-preset" data-url="https://www.google.com">
-            <span class="dot"></span> Google (Safe)
-          </button>
-          <button class="preset-btn caution-preset" data-url="http://mybank-security-update.com/login?session=8932">
-            <span class="dot"></span> Banking Update (Caution)
-          </button>
-          <button class="preset-btn danger-preset" data-url="http://login.paypal.verify-account.info/auth/signin?token=12345">
-            <span class="dot"></span> Brand Spoofing (High Risk)
-          </button>
-          <button class="preset-btn danger-preset" data-url="http://104.28.14.2/secure/verify-account?redirect=aHR0cHM6Ly9nb29nbGUuY29t">
-            <span class="dot"></span> Direct IP + Base64
-          </button>
-          <button class="preset-btn caution-preset" data-url="http://a8f9x2z1q7m.xyz/account/login">
-            <span class="dot"></span> DGA Domain (.xyz)
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Radar Scanning Loader -->
-    <div class="scanner-loader hidden" id="scannerLoader">
-      <div class="radar-circle">
-        <div class="radar-sweep"></div>
-      </div>
-      <p class="loader-text">Executing Level 1-5 Intelligence (VirusTotal, Sandbox Hops, NLP &amp; Mitigation)...</p>
     </div>
-
-    <!-- Results Display Container -->
-    <div id="resultsContainer" class="results-container hidden">
-      
-      <!-- Multi-Persona Mode Bar -->
-      <div class="persona-bar glass-card">
-        <div class="persona-tabs" id="personaTabs">
-          <button class="tab-btn active" data-tab="user">
-            <span class="tab-icon">👤</span> User Mode
-          </button>
-          <button class="tab-btn" data-tab="expert">
-            <span class="tab-icon">🔬</span> Technical Deep-Dive
-          </button>
-          <button class="tab-btn" data-tab="threat">
-            <span class="tab-icon">📊</span> Threat Matrix &amp; Badges
-          </button>
-          <button class="tab-btn" data-tab="defense">
-            <span class="tab-icon">🛡️</span> Active Defense Rules
-          </button>
-          <button class="tab-btn" data-tab="benchmark">
-            <span class="tab-icon">⚡</span> Red/Blue Benchmark
-          </button>
-        </div>
-
-        <div class="export-container">
-          <button class="export-report-btn" id="exportReportBtn" title="Export Security Audit Report">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Export Audit Report
-          </button>
-        </div>
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px]" id="mobileBackendStatus">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-slate-300 font-mono">Online</span>
       </div>
+    </div>
+  </header>
 
-      <!-- VIEW 1: USER LAYER (DEFAULT) -->
-      <section class="persona-view-section" id="userLayerView">
-        <div class="dashboard-grid">
-          
-          <!-- Risk Score Meter Card -->
-          <div class="glass-card score-card">
-            <div class="card-header">
-              <h3>Risk Index</h3>
-              <span class="risk-badge" id="userRiskBadge">SAFE</span>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 lg:pt-8">
+    <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+
+      <!-- DESKTOP LEFT SIDEBAR -->
+      <aside class="hidden lg:block lg:col-span-3 space-y-6">
+        <!-- Desktop Brand Header Card -->
+        <div class="glass-card p-5 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-cyan-950/60 border border-cyan-500/40 flex items-center justify-center shadow-xl shadow-cyan-500/20" id="headerBrandLogo">
+              <img id="headerBrandImg" src="icons/level5_evolving_tactician.svg" alt="Active Icon" class="w-9 h-9 filter drop-shadow-md" />
             </div>
-            
-            <div class="gauge-wrapper">
-              <svg class="gauge-svg" viewBox="0 0 160 160">
-                <circle class="gauge-bg" cx="80" cy="80" r="65"></circle>
-                <circle class="gauge-fill" id="gaugeFill" cx="80" cy="80" r="65" stroke-dasharray="408" stroke-dashoffset="408"></circle>
-              </svg>
-              <div class="gauge-center">
-                <span class="score-number" id="userRiskScore">0</span>
-                <span class="score-max">/ 100</span>
-              </div>
-            </div>
-
-            <p class="score-subtext" id="scoreSubtext">Normalized Level 1-5 Threat Index</p>
-          </div>
-
-          <!-- Plain-English Summary & Threat Chips Card -->
-          <div class="glass-card summary-card">
-            <div class="card-header">
-              <h3>Security Evaluation Summary</h3>
-              <span class="shield-indicator" id="shieldIndicator">🛡️</span>
-            </div>
-
-            <div class="summary-body">
-              <div class="threat-categories-wrapper" id="threatCategoriesWrapper">
-                <!-- Threat Chips -->
-              </div>
-
-              <p class="summary-text" id="userSummary">Enter a URL above to analyze its security level.</p>
-              
-              <div class="recommendation-box" id="recommendationBox">
-                <div class="rec-icon" id="recIcon">ℹ️</div>
-                <div class="rec-content">
-                  <h4 id="recTitle">Recommendation</h4>
-                  <p id="recDesc">Always double-check link destinations before entering credentials.</p>
-                </div>
-              </div>
+            <div>
+              <h1 class="font-extrabold text-lg tracking-tight text-amber-400 leading-snug">Smart Phishing &amp; URL Analyzer</h1>
+              <span class="inline-block mt-1 px-2.5 py-0.5 text-xs font-mono font-semibold rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">v5.0 AUTONOMIC</span>
             </div>
           </div>
+          <p class="text-xs text-slate-400 leading-relaxed border-t border-slate-800/80 pt-3">
+            Level 5 Threat Intelligence, Redirect Sandbox, Active Defense Firewall Exporter &amp; Red/Blue Loop.
+          </p>
 
-        </div>
-
-        <!-- Level 2 Live Threat Intel Badges -->
-        <div class="threat-intel-badges-row margin-top-lg" id="threatIntelBadgesRow">
-          <!-- Dynamically populated intel badges -->
-        </div>
-
-        <!-- Level 3 Sandboxed Redirect Node Map -->
-        <div class="glass-card margin-top-lg">
-          <div class="card-header">
-            <h3><span class="code-icon">🔗</span> Sandboxed HTTP Redirect Node Map</h3>
-            <span class="tech-tag">Behavioral Tracer</span>
-          </div>
-          <div class="redirect-node-map" id="redirectNodeMap">
-            <!-- Dynamically populated redirect nodes -->
+          <div class="pt-2 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80" id="backendStatus">
+            <span class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="status-text font-mono text-emerald-400">API Connected</span>
+            </span>
+            <span class="text-[10px] font-mono text-slate-500">PORT 5000</span>
           </div>
         </div>
-      </section>
 
-      <!-- VIEW 2: EXPERT LAYER (TECHNICAL DEEP-DIVE) -->
-      <section class="persona-view-section hidden" id="expertLayerView">
-        <div class="expert-grid">
-          
-          <!-- Domain Breakdown Card -->
-          <div class="glass-card expert-card">
-            <div class="card-header">
-              <h3><span class="code-icon">&lt;/&gt;</span> Domain Structure Breakdown</h3>
-              <span class="tech-tag">Parser</span>
-            </div>
-            <div class="breakdown-grid" id="domainBreakdownGrid">
-              <!-- Populated -->
-            </div>
+        <!-- Desktop Action Buttons -->
+        <div class="space-y-3">
+          <button id="iconPortfolioBtn" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-red-500/10 border border-amber-500/30 text-amber-300 hover:text-amber-200 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/10 transition-all font-semibold text-xs">
+            <span class="flex items-center gap-2">
+              <span class="text-base">🎨</span> Select Agent Icon
+            </span>
+            <span class="text-[10px] font-mono bg-amber-500/20 px-2 py-0.5 rounded">5 SVG Icons</span>
+          </button>
+
+          <button id="historyToggleBtn" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-all font-medium text-xs">
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              Scan History
+            </span>
+            <span class="px-2 py-0.5 rounded-full bg-slate-800 text-cyan-400 font-mono text-[11px]" id="historyCount">0</span>
+          </button>
+        </div>
+
+        <!-- Quick Scan Presets Card -->
+        <div class="glass-card p-4 space-y-3">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>⚡</span> Test Url Presets
+          </h3>
+          <div class="space-y-2 text-xs">
+            <button onclick="setTestPreset('google.com')" class="w-full text-left px-3 py-2 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-950/20 transition-all flex items-center justify-between group">
+              <span class="font-mono text-slate-300 group-hover:text-emerald-300 truncate">google.com</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-semibold">SAFE</span>
+            </button>
+
+            <button onclick="setTestPreset('g00gle-login-verify.com')" class="w-full text-left px-3 py-2 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-red-500/50 hover:bg-red-950/20 transition-all flex items-center justify-between group">
+              <span class="font-mono text-slate-300 group-hover:text-red-300 truncate">g00gle-login-verify.com</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-semibold">TYPOSQUAT</span>
+            </button>
+
+            <button onclick="setTestPreset('http://login.paypal.verify-account.info/auth')" class="w-full text-left px-3 py-2 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-red-500/50 hover:bg-red-950/20 transition-all flex items-center justify-between group">
+              <span class="font-mono text-slate-300 group-hover:text-red-300 truncate">login.paypal.verify...</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-semibold">PHISHING</span>
+            </button>
           </div>
+        </div>
+      </aside>
 
-          <!-- Network & Security Telemetry Card -->
-          <div class="glass-card expert-card">
-            <div class="card-header">
-              <h3><span class="code-icon">⚡</span> Security Flags &amp; Telemetry</h3>
-              <span class="tech-tag">Heuristics</span>
-            </div>
-            <div class="telemetry-list" id="telemetryList">
-              <!-- Populated -->
-            </div>
-          </div>
+      <!-- MAIN CONTENT WORKSPACE -->
+      <main class="lg:col-span-9 space-y-6">
 
-          <!-- Simulated HTTP Security Headers Grid -->
-          <div class="glass-card expert-card full-width">
-            <div class="card-header">
-              <h3><span class="code-icon">🔒</span> Simulated Security Headers Inspection</h3>
-              <span class="tech-tag">HTTP Headers</span>
-            </div>
-            <div class="headers-grid" id="headersGrid">
-              <!-- Populated -->
-            </div>
-          </div>
+        <!-- GLOBAL COMMAND PALETTE SEARCH BAR -->
+        <section class="glass-card p-4 sm:p-6 shadow-2xl relative overflow-hidden">
+          <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-          <!-- Raw JSON Inspector -->
-          <div class="glass-card expert-card full-width">
-            <div class="card-header">
-              <h3><span class="code-icon">{ }</span> Raw Dual-Layered JSON Telemetry</h3>
-              <button class="copy-json-btn" id="copyJsonBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-                Copy JSON
+          <form id="urlForm" class="space-y-4">
+            <div class="flex items-center justify-between">
+              <label for="urlInput" class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Global URL Command Palette
+              </label>
+              <span class="text-[11px] text-slate-500 font-mono hidden sm:inline">Press ENTER to scan</span>
+            </div>
+
+            <div class="relative flex items-center">
+              <div class="absolute left-4 text-slate-400 pointer-events-none">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              </div>
+
+              <input 
+                type="text" 
+                id="urlInput" 
+                placeholder="Enter suspicious URL (e.g. google.com or g00gle-login-verify.com)..." 
+                autocomplete="off" 
+                required 
+                class="w-full pl-12 pr-28 py-4 bg-slate-950/80 border border-slate-700/80 rounded-2xl text-slate-100 placeholder-slate-500 text-sm sm:text-base font-mono focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20 shadow-inner transition-all"
+              />
+
+              <button 
+                type="button" 
+                id="clearBtn" 
+                class="absolute right-24 text-slate-500 hover:text-slate-300 text-sm p-2 hidden font-bold" 
+                title="Clear input"
+              >&times;</button>
+
+              <button 
+                type="submit" 
+                id="submitBtn" 
+                class="absolute right-2 px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-cyan-500/25 transition-all flex items-center gap-2 active:scale-95"
+              >
+                <span>Analyze</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
               </button>
             </div>
-            <pre class="json-code-block"><code id="rawJsonCode">// JSON output will appear here</code></pre>
-          </div>
 
-        </div>
-      </section>
-
-      <!-- VIEW 3: THREAT INTEL MATRIX -->
-      <section class="persona-view-section hidden" id="threatLayerView">
-        <div class="glass-card threat-matrix-card">
-          <div class="card-header">
-            <h3><span class="code-icon">📈</span> Threat Factor Analysis &amp; Risk Weighting</h3>
-            <span class="tech-tag">Security Matrix</span>
-          </div>
-
-          <div class="matrix-bars-container" id="matrixBarsContainer">
-            <!-- Populated -->
-          </div>
-        </div>
-      </section>
-
-      <!-- VIEW 4: ACTIVE DEFENSE & MITIGATION PAYLOADS -->
-      <section class="persona-view-section hidden" id="defenseLayerView">
-        <div class="glass-card active-defense-card">
-          <div class="card-header">
-            <h3><span class="code-icon">🛡️</span> Active Defense Payload Generator</h3>
-            <span class="tech-tag">Automated Mitigation</span>
-          </div>
-
-          <p class="defense-desc">Download or copy ready-to-deploy perimeter mitigation rules generated for this target threat:</p>
-
-          <div class="mitigation-grid">
-            <!-- Windows Firewall Netsh -->
-            <div class="mitigation-box">
-              <div class="mitigation-header">
-                <h4>Windows Firewall (netsh) script</h4>
-                <button class="dl-btn" id="dlNetshBtn">Download .bat</button>
-              </div>
-              <pre class="payload-code"><code id="netshCode">// Windows firewall command</code></pre>
+            <!-- Mobile Quick Preset Chips -->
+            <div class="lg:hidden flex items-center gap-2 pt-1 overflow-x-auto text-[11px] font-mono no-scrollbar">
+              <span class="text-slate-500 shrink-0">Try:</span>
+              <button type="button" onclick="setTestPreset('google.com')" class="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-emerald-400 shrink-0">google.com</button>
+              <button type="button" onclick="setTestPreset('g00gle-login-verify.com')" class="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-red-400 shrink-0">g00gle-login-verify.com</button>
             </div>
+          </form>
+        </section>
 
-            <!-- Hosts File Entry -->
-            <div class="mitigation-box">
-              <div class="mitigation-header">
-                <h4>Local Hosts File Blocklist</h4>
-                <button class="dl-btn" id="dlHostsBtn">Download hosts.txt</button>
-              </div>
-              <pre class="payload-code"><code id="hostsCode">// Hosts file entry</code></pre>
+        <!-- LIVE INTERACTIVE RADAR SCANNING LOADER -->
+        <div id="scannerLoader" class="glass-card p-8 text-center space-y-6 hidden">
+          <div class="relative w-28 h-28 mx-auto flex items-center justify-center">
+            <div class="w-full h-full rounded-full border-2 border-cyan-500/20 relative overflow-hidden shadow-2xl shadow-cyan-500/20">
+              <div class="radar-sweep"></div>
             </div>
-
-            <!-- DNS Sinkhole RPZ -->
-            <div class="mitigation-box full-width">
-              <div class="mitigation-header">
-                <h4>DNS Response Policy Zone (RPZ) Sinkhole Rule</h4>
-                <button class="dl-btn" id="dlDnsBtn">Download dns-rpz.conf</button>
-              </div>
-              <pre class="payload-code"><code id="dnsCode">// DNS sinkhole rule</code></pre>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-2xl animate-pulse">🛡️</span>
             </div>
           </div>
+          <div class="space-y-2">
+            <h3 class="text-cyan-400 font-extrabold text-base tracking-wide font-mono animate-pulse" id="scannerLoaderText">EXECUTING LEVEL 5 AUTONOMIC THREAT SCAN...</h3>
+            <p class="text-xs text-slate-400 font-mono" id="scannerStepLog">Connecting to VirusTotal v3 &amp; Safe Browsing v5 API stubs...</p>
+          </div>
         </div>
-      </section>
 
-      <!-- VIEW 5: RED/BLUE ADVERSARIAL BENCHMARK -->
-      <section class="persona-view-section hidden" id="benchmarkLayerView">
-        <div class="glass-card benchmark-card">
-          <div class="card-header">
-            <h3><span class="code-icon">⚡</span> Autonomic Red/Blue Team Stress Test &amp; Benchmarks</h3>
-            <button class="run-benchmark-btn" id="runBenchmarkBtn">
-              <span>▶ Run Adversarial Test Suite</span>
+        <!-- THREAT ANALYSIS RESULTS WORKSPACE -->
+        <div id="resultsContainer" class="space-y-6 hidden">
+
+          <!-- ANIMATED PERSONA TAB SWITCHER -->
+          <div class="flex items-center justify-between gap-4 flex-wrap pb-2 border-b border-slate-800">
+            <nav class="flex items-center gap-1.5 p-1 bg-slate-950/80 border border-slate-800 rounded-xl text-xs font-semibold" id="personaTabs">
+              <button data-tab="user" class="tab-btn px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition-all active">👤 User View</button>
+              <button data-tab="expert" class="tab-btn px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition-all">🔬 Technical</button>
+              <button data-tab="threat" class="tab-btn px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition-all">📊 Matrix</button>
+              <button data-tab="defense" class="tab-btn px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition-all">🛡️ Defense</button>
+              <button data-tab="benchmark" class="tab-btn px-3.5 py-2 rounded-lg text-slate-400 hover:text-white transition-all">⚡ Red/Blue</button>
+            </nav>
+
+            <button id="exportReportBtn" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700/80 text-emerald-400 hover:bg-emerald-950/30 hover:border-emerald-500/50 text-xs font-semibold transition-all flex items-center gap-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              <span>Export Audit Report</span>
             </button>
           </div>
 
-          <div class="benchmark-stats-grid" id="benchmarkStatsGrid">
-            <div class="bench-stat-card">
-              <span class="bench-label">Precision Rate</span>
-              <span class="bench-value" id="benchPrecision">96.8%</span>
+          <!-- TAB 1: USER LAYER DASHBOARD -->
+          <div id="userLayerView" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+
+              <!-- Animated Risk Gauge Card -->
+              <div class="md:col-span-5 glass-card p-6 flex flex-col items-center justify-center text-center space-y-4">
+                <div class="w-full flex items-center justify-between text-xs font-semibold text-slate-400 border-b border-slate-800 pb-3">
+                  <span>THREAT RISK INDEX</span>
+                  <span id="userRiskBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wide">SAFE</span>
+                </div>
+
+                <div class="relative w-44 h-44 my-2">
+                  <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.06)" stroke-width="12" fill="none" />
+                    <circle id="gaugeFill" cx="50" cy="50" r="40" stroke="#10b981" stroke-width="12" fill="none" stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" class="transition-all duration-1000 ease-out" />
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span id="userRiskScore" class="text-4xl font-extrabold font-mono tracking-tight">0</span>
+                    <span class="text-[11px] text-slate-400 font-mono mt-0.5">/ 100</span>
+                  </div>
+                </div>
+
+                <p class="text-xs text-slate-400 font-mono" id="scoreSubtext">Normalized Heuristic Risk Vector Score</p>
+              </div>
+
+              <!-- Executive Verdict & Recommendation Card -->
+              <div class="md:col-span-7 glass-card p-6 flex flex-col justify-between space-y-4">
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                      <span id="shieldIndicator" class="text-lg">🛡️</span> Analysis Summary
+                    </h3>
+                    <div id="threatCategoriesWrapper" class="flex flex-wrap gap-1.5"></div>
+                  </div>
+
+                  <p id="userSummary" class="text-sm sm:text-base text-slate-200 leading-relaxed font-sans"></p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-start gap-3">
+                  <span id="recIcon" class="text-2xl">✅</span>
+                  <div class="space-y-1">
+                    <h4 id="recTitle" class="text-xs font-bold text-slate-200 uppercase tracking-wide">Safe to Browse</h4>
+                    <p id="recDesc" class="text-xs text-slate-400 leading-relaxed"></p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="bench-stat-card">
-              <span class="bench-label">Recall Rate</span>
-              <span class="bench-value" id="benchRecall">92.5%</span>
+
+            <!-- Threat Intelligence Live Badges -->
+            <div class="space-y-3">
+              <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                <span>🛰️</span> Live Threat Intelligence API Indicators
+              </h3>
+              <div id="threatIntelBadgesRow" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
             </div>
-            <div class="bench-stat-card">
-              <span class="bench-label">Evasion Resilience</span>
-              <span class="bench-value safe" id="benchResilience">HIGH</span>
-            </div>
-            <div class="bench-stat-card">
-              <span class="bench-label">Tests Passed</span>
-              <span class="bench-value" id="benchTestsPassed">8 / 8</span>
+
+            <!-- Level 3 Redirect Chain Sandbox Map -->
+            <div class="glass-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                  <span class="text-purple-400">📦</span> Level 3 Redirect Chain Sandbox Execution Map
+                </h3>
+                <span class="text-xs font-mono text-purple-400 px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20">Headless Trace</span>
+              </div>
+              <div id="redirectNodeMap" class="flex items-center gap-3 overflow-x-auto py-2"></div>
             </div>
           </div>
 
-          <div class="benchmark-table-wrapper margin-top-lg">
-            <table class="benchmark-table">
-              <thead>
-                <tr>
-                  <th>Test ID</th>
-                  <th>Evasion Technique</th>
-                  <th>Test Payload URL</th>
-                  <th>Risk Score</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="benchmarkTableBody">
-                <!-- Benchmark test rows dynamically inserted -->
-              </tbody>
-            </table>
+          <!-- TAB 2: TECHNICAL EXPERT LAYER -->
+          <div id="expertLayerView" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              <!-- Domain Structure Breakdown Card -->
+              <div class="glass-card p-6 space-y-4">
+                <h3 class="text-sm font-semibold text-slate-300 flex items-center gap-2 border-b border-slate-800 pb-3">
+                  <span class="font-mono text-cyan-400">&lt;/&gt;</span> Domain Structure &amp; URL Normalization
+                </h3>
+                <div id="domainBreakdownGrid" class="grid grid-cols-2 gap-3"></div>
+              </div>
+
+              <!-- Security Telemetry Card -->
+              <div class="glass-card p-6 space-y-4">
+                <h3 class="text-sm font-semibold text-slate-300 flex items-center gap-2 border-b border-slate-800 pb-3">
+                  <span class="font-mono text-cyan-400">⚡</span> Security Heuristics Telemetry
+                </h3>
+                <div id="telemetryList" class="space-y-2"></div>
+              </div>
+            </div>
+
+            <!-- HTTP Headers Card -->
+            <div class="glass-card p-6 space-y-4">
+              <h3 class="text-sm font-semibold text-slate-300 border-b border-slate-800 pb-3">Simulated HTTP Response Security Headers</h3>
+              <div id="headersGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs"></div>
+            </div>
+
+            <!-- Raw JSON Telemetry Inspector -->
+            <div class="glass-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-semibold text-slate-300 font-mono">Raw JSON Response Inspector</h3>
+                <button id="copyJsonBtn" class="px-3 py-1 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-300 hover:text-white hover:border-slate-600 transition-all flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                  <span>Copy JSON</span>
+                </button>
+              </div>
+              <pre id="rawJsonCode" class="p-4 bg-slate-950 rounded-xl border border-slate-800/80 font-mono text-xs text-emerald-400 overflow-x-auto max-h-96"></pre>
+            </div>
           </div>
+
+          <!-- TAB 3: THREAT MATRIX -->
+          <div id="threatLayerView" class="glass-card p-6 space-y-4 hidden">
+            <h3 class="text-sm font-semibold text-slate-300 border-b border-slate-800 pb-3">Threat Category Risk Vector Weighting</h3>
+            <div id="matrixBarsContainer" class="space-y-4"></div>
+          </div>
+
+          <!-- TAB 4: ACTIVE DEFENSE FIREWALL EXPORTER -->
+          <div id="defenseLayerView" class="glass-card p-6 space-y-6 hidden">
+            <div class="space-y-2 border-b border-slate-800 pb-4">
+              <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
+                <span class="text-emerald-400">🛡️</span> Level 4 One-Click Active Defense Firewall Exporter
+              </h3>
+              <p class="text-xs text-slate-400">Generate automated blocking scripts to neutralize identified threat domains across local firewalls and DNS servers.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+                  <span>Windows Firewall</span>
+                  <span class="text-[10px] font-mono text-cyan-400">.BAT Script</span>
+                </div>
+                <pre id="netshCode" class="text-[11px] font-mono text-slate-400 bg-slate-900 p-2.5 rounded-lg overflow-x-auto"></pre>
+                <button id="dlNetshBtn" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs rounded-lg transition-all">Download .BAT</button>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+                  <span>Hosts File Rule</span>
+                  <span class="text-[10px] font-mono text-cyan-400">hosts.txt</span>
+                </div>
+                <pre id="hostsCode" class="text-[11px] font-mono text-slate-400 bg-slate-900 p-2.5 rounded-lg overflow-x-auto"></pre>
+                <button id="dlHostsBtn" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs rounded-lg transition-all">Download Hosts Rule</button>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+                  <span>DNS Sinkhole (RPZ)</span>
+                  <span class="text-[10px] font-mono text-cyan-400">rpz.conf</span>
+                </div>
+                <pre id="dnsCode" class="text-[11px] font-mono text-slate-400 bg-slate-900 p-2.5 rounded-lg overflow-x-auto"></pre>
+                <button id="dlDnsBtn" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs rounded-lg transition-all">Download RPZ Conf</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 5: RED/BLUE ADVERSARIAL BENCHMARK -->
+          <div id="benchmarkLayerView" class="glass-card p-6 space-y-6 hidden">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
+                  <span class="text-amber-400">⚡</span> Level 5 Autonomic Red/Blue Adversarial Loop
+                </h3>
+                <p class="text-xs text-slate-400 mt-1">Real-time benchmark testing threat detection algorithms against synthetic evasion payloads.</p>
+              </div>
+              <button id="runBenchmarkBtn" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shadow-amber-500/20 transition-all">
+                Run Live Benchmark
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+              <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span class="text-xs text-slate-400 font-mono">Accuracy</span>
+                <div id="benchAccuracy" class="text-2xl font-extrabold text-emerald-400 font-mono">--%</div>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span class="text-xs text-slate-400 font-mono">Resilience</span>
+                <div id="benchResilience" class="text-2xl font-extrabold text-cyan-400 font-mono">HIGH</div>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span class="text-xs text-slate-400 font-mono">Passed Tests</span>
+                <div id="benchPassed" class="text-2xl font-extrabold text-slate-200 font-mono">0 / 0</div>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span class="text-xs text-slate-400 font-mono">Recall Rate</span>
+                <div id="benchRecall" class="text-2xl font-extrabold text-purple-400 font-mono">--%</div>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-slate-800 text-slate-400 font-mono">
+                    <th class="py-3 px-4">Test Payload Name</th>
+                    <th class="py-3 px-4">Evasion Technique</th>
+                    <th class="py-3 px-4">Score</th>
+                    <th class="py-3 px-4">Result</th>
+                  </tr>
+                </thead>
+                <tbody id="benchmarkTableBody" class="divide-y divide-slate-800/60 font-mono"></tbody>
+              </table>
+            </div>
+          </div>
+
         </div>
-      </section>
+      </main>
 
     </div>
   </div>
 
-  <!-- Recent Scans History Drawer -->
+  <!-- MOBILE FIXED BOTTOM NAVIGATION BAR -->
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800 px-4 py-2 flex items-center justify-around">
+    <button onclick="mobileNavAction('scan')" class="flex flex-col items-center gap-1 text-cyan-400 font-semibold text-[10px]">
+      <span class="text-lg">🔍</span>
+      <span>Analyzer</span>
+    </button>
+    <button onclick="mobileNavAction('history')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-cyan-400 font-semibold text-[10px]">
+      <span class="text-lg">📜</span>
+      <span>History</span>
+    </button>
+    <button onclick="mobileNavAction('icons')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-amber-400 font-semibold text-[10px]">
+      <span class="text-lg">🎨</span>
+      <span>Icons</span>
+    </button>
+    <button onclick="mobileNavAction('benchmark')" class="flex flex-col items-center gap-1 text-slate-400 hover:text-purple-400 font-semibold text-[10px]">
+      <span class="text-lg">⚡</span>
+      <span>Loop</span>
+    </button>
+  </nav>
+
+  <!-- RECENT SCANS HISTORY DRAWER MODAL -->
   <div class="history-modal hidden" id="historyModal">
     <div class="history-content glass-card">
       <div class="history-header">
-        <h3><span class="code-icon">📜</span> Recent Analysis History</h3>
+        <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2"><span class="code-icon">📜</span> Recent Analysis History</h3>
         <div class="history-header-actions">
           <button class="clear-history-btn" id="clearHistoryBtn">Clear History</button>
           <button class="close-history-btn" id="closeHistoryBtn">&times;</button>
@@ -381,13 +462,13 @@
     </div>
   </div>
 
-  <!-- Agent Icon Selection Panel Modal -->
+  <!-- AGENT ICON SELECTION PANEL MODAL -->
   <div class="icon-modal hidden" id="iconModal">
     <div class="icon-modal-content glass-card">
       <div class="icon-modal-header">
         <div>
-          <h3><span class="code-icon">🎨</span> Agent Icon Selection Panel</h3>
-          <p class="icon-modal-subtitle">Preview & deploy SVG vector icons for Threat Intelligence Levels 1 through 5</p>
+          <h3 class="text-base font-bold text-slate-200 flex items-center gap-2"><span class="code-icon">🎨</span> Agent Icon Selection Panel</h3>
+          <p class="icon-modal-subtitle">Preview &amp; deploy SVG vector icons for Threat Intelligence Levels 1 through 5</p>
         </div>
         <button class="close-icon-btn" id="closeIconBtn">&times;</button>
       </div>
@@ -413,7 +494,7 @@
               <span>32x32</span>
             </div>
           </div>
-          <p class="icon-desc">Heuristic analyst probe with circuit & checkmark logic.</p>
+          <p class="icon-desc">Heuristic analyst probe with circuit &amp; checkmark logic.</p>
           <button class="approve-deploy-btn" data-icon-path="icons/level1_logic_probe.svg" data-icon-name="The Logic Probe">Approve &amp; Deploy</button>
         </div>
 

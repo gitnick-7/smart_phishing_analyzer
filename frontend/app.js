@@ -202,6 +202,11 @@ function deployActiveIcon(iconPath, iconName) {
     headerBrandImg.src = iconPath;
   }
 
+  const mobileBrandImg = document.getElementById('mobileHeaderBrandImg');
+  if (mobileBrandImg) {
+    mobileBrandImg.src = iconPath;
+  }
+
   if (dynamicFavicon) {
     dynamicFavicon.href = iconPath;
   }
@@ -223,12 +228,44 @@ function deployActiveIcon(iconPath, iconName) {
   localStorage.setItem('phish_active_icon', iconPath);
 }
 
+// Quick Test Presets Helper
+function setTestPreset(urlStr) {
+  if (urlInput) {
+    urlInput.value = urlStr;
+    clearBtn.style.display = 'block';
+    analyzeUrl(urlStr);
+  }
+}
+
+// Mobile Bottom Navigation Handler
+function mobileNavAction(action) {
+  if (action === 'scan') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (urlInput) urlInput.focus();
+  } else if (action === 'history') {
+    if (historyModal) historyModal.classList.remove('hidden');
+  } else if (action === 'icons') {
+    if (iconModal) iconModal.classList.remove('hidden');
+  } else if (action === 'benchmark') {
+    const tabBtn = document.querySelector('[data-tab="benchmark"]');
+    if (tabBtn) tabBtn.click();
+    if (resultsContainer) resultsContainer.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
 // Main Analysis Call
 async function analyzeUrl(targetUrl) {
   currentTargetUrl = targetUrl;
   scannerLoader.classList.remove('hidden');
   resultsContainer.classList.add('hidden');
   submitBtn.disabled = true;
+
+  const stepLogEl = document.getElementById('scannerStepLog');
+  if (stepLogEl) {
+    stepLogEl.textContent = 'Resolving DNS & Extracting Apex Domain...';
+    setTimeout(() => { if (stepLogEl) stepLogEl.textContent = 'Querying VirusTotal v3 & Google Safe Browsing stubs...'; }, 300);
+    setTimeout(() => { if (stepLogEl) stepLogEl.textContent = 'Calculating Shannon Entropy & Levenshtein Typosquatting...'; }, 600);
+  }
 
   try {
     const response = await fetch(`${API_BASE_URL}/analyze`, {
